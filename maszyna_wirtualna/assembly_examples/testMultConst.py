@@ -1,18 +1,26 @@
+# a * b:
+# a,b stałe - wstaw do rejestru wynikowego a * b
+# a,b, jedna zmienna, jedna stała - użyj sposobu z tego pliku i po asemblerowych obliczeniach w rejestrze wynikowym bedzie a * b
+# przy czym pamiętaj zamienić tak, aby na drugim miejcu była stała, a do rejestru a załaduj wartość zmiennej
+# to się opłaca tylko wtedy gdy stała jest mniejsza od wartości zmiennej
+
 import testGenConst
 
-number1 = 3000
-number2 = -50000
+const = 100000000
 asm = ""
-if number1 == 0 or number2 == 0:
+if const == 0:
     asm += "RESET a\n"
 else:
-    # in register r_a is number1
-    asm += testGenConst.generateConstant(abs(number1))
-    asm += "RESET h\n"
-    asm += "STORE h\n"
+    # asm += testGenConst.generateConstant(abs(number1)) - for test generate const,
+    # in practice we have value of variable in r_a
+    instr = "ADD" if const >= 0 else "SUB"
+    asm += "GET\n"
+    asm += "SWAP d\n"  # value of number1 saved in register d
+    asm += "RESET a\n"
+    asm += f"{instr} d\n"
     asm += "RESET b\n"
     asm += "RESET c\n"
-    binary = f'{abs(number2):b}'
+    binary = f'{abs(const):b}'
     n = len(binary)
     first_one_read = False
     for i in range(n - 1, -1, -1):
@@ -23,16 +31,14 @@ else:
                     asm += "SHIFT c\n"
             else:
                 asm += "SWAP b\n"
-                asm += "LOAD h\n"
+                asm += "RESET a\n"
+                asm += f"{instr} d\n"
                 asm += "SHIFT c\n"
                 asm += "ADD b\n"
         asm += "INC c\n"
-    if number1 * number2 < 0:
-        asm += "SWAP b\n"
-        asm += "RESET a\n"
-        asm += "SUB b\n"
 asm += "PUT\n"
 asm += "HALT\n"
 print(asm)
 
 # dodać ify gdy mnożymy przez 1, -1?
+# dodać shift gdy mnożymy przez 2?
