@@ -1,0 +1,14 @@
+VAR
+    a
+BEGIN
+    (IF a EQ 3 THEN)
+    (IF a NEQ 3 THEN)
+    (IF a LE 3 THEN)
+    (IF a GE 3 THEN)
+    (IF a LEQ 3 THEN)
+    IF a GEQ 3 THEN
+        WRITE 1;
+    ELSE
+        WRITE 0;
+    ENDIF
+END

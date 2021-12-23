@@ -20,4 +20,6 @@ pip-selfcheck.json
 *.iml
 out
 gen
+*.o
 /maszyna_wirtualna/assembly_examples/
+/questions/
