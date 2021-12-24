@@ -13,7 +13,7 @@ class CompilerLexer(Lexer):
               PLUS, MINUS, TIMES, DIV, MOD,
               EQ, NEQ, LE, GE, LEQ, GEQ,
               NUM, PIDENTIFIER}
-    literals = {'-', '[', ']', ':', ';', ','}  # - unary minus
+    literals = {'[', ']', ':', ';', ','}  # - unary minus
 
     ignore = ' \t'
 
@@ -59,9 +59,12 @@ class CompilerLexer(Lexer):
 
     PIDENTIFIER = r'[_a-z]+'
 
-    @_(r'\d+')
+    @_(r'-?\d+')
     def NUM(self, t):
-        t.value = int(t.value)
+        if t.value[0] == "-":
+            t.value = -1 * int(t.value[1:])
+        else:
+            t.value = int(t.value)
         return t
 
     def error(self, t):
@@ -72,7 +75,7 @@ class CompilerLexer(Lexer):
 if __name__ == '__main__':
     data = '''
 VAR
-    _nwhtTile, p
+    _nwhtile, p
 BEGIN
     (KOMENTARZ bardzo dłigi
     ale bardzo lasny!!
@@ -81,7 +84,7 @@ BEGIN
     IF n GEQ 0 THEN
 	REPEAT
 	    p ASSIGN n DIV 2;
-	    p ASSIGN 2 TIMES p;
+	    p ASSIGN -2 TIMES p;
 	    IF n NEQ p THEN 
 		WRITE 1;
 	    ELSE 
