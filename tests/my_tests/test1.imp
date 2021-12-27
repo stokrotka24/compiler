@@ -7,7 +7,5 @@ BEGIN
     WRITE b;
     c ASSIGN b PLUS a;
     WRITE c;
-    (WRITE -5;)
+    WRITE -5;
 END
-
-

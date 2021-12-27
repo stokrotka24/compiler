@@ -5,25 +5,26 @@ from CompilerLexer import CompilerLexer
 from CompilerException import CompilerException
 from CodeGenerator import CodeGenerator
 from SymbolTable import SymbolTable, Variable
+from ParserAttrs import IdentifierAttr, ValueAttr
 
 
 # noinspection PyUnresolvedReferences
 class CompilerParser(Parser):
     tokens = CompilerLexer.tokens
     symbol_table = SymbolTable()
-    codeGenerator = CodeGenerator(symbol_table)
+    code_generator = CodeGenerator(symbol_table)
 
     @_('VAR declarations BEGIN commands END', 'BEGIN commands END')
     def program(self, p):
         asm = p.commands
-        asm += "HALT"
+        asm.append("HALT")
         return asm
 
     @_('declarations "," PIDENTIFIER', 'PIDENTIFIER')
     def declarations(self, p):
         message = self.symbol_table.variable_declaration(p.PIDENTIFIER)
         if message:
-            raise CompilerException(p.lineno, message)
+            raise CompilerException(message, p.lineno)
 
     # @_('declarations "," PIDENTIFIER "[" NUM ":" NUM "]"')
     # def declarations(self, p):
@@ -43,15 +44,7 @@ class CompilerParser(Parser):
 
     @_('identifier ASSIGN expression ";"')
     def command(self, p):
-        asm = ""
-        asm += p.expression
-        asm += "SWAP g\n"
-        code, variable_name = p.identifier
-        asm += code
-        asm += "SWAP g\n"
-        asm += "STORE g\n"
-        self.symbol_table[variable_name].initialized = True
-        return asm
+        return self.code_generator.assign(p.identifier, p.expression)
 
     #
     # @_('IF condition THEN commands ELSE commands ENDIF')
@@ -80,36 +73,23 @@ class CompilerParser(Parser):
 
     @_('READ identifier ";"')
     def command(self, p):
-        asm, variable_name = p.identifier
-        asm += self.codeGenerator.store_variable_value(variable_name)
+        asm, var_name = p.identifier.var_address_asm, p.identifier.var_name
+        asm += self.code_generator.store_variable_value(var_name)
         return asm
 
     @_('WRITE value ";"')
     def command(self, p):
-        asm, _, _ = p.value
-        asm += "PUT\n"
+        asm = p.value.get_value_asm
+        asm.append("PUT")
         return asm
 
     @_('value')
     def expression(self, p):
-        asm, _, _ = p.value
-        return asm
+        return p.value.get_value_asm
 
     @_('value PLUS value')
     def expression(self, p):
-        type0 = p.value0[1]
-        type1 = p.value1[1]
-        asm = ""
-        if type0 == "constant" and type1 == "constant":
-            num0 = p.value0[2]
-            num1 = p.value1[2]
-            asm += self.codeGenerator.generate_constant(num0+num1)
-        else:
-            asm += p.value0[0]
-            asm += "SWAP g\n"
-            asm += p.value1[0]
-            asm += "ADD g\n"
-        return asm
+        return self.code_generator.add(p.value0, p.value1)
 
     #
     # @_('value MINUS value')
@@ -154,23 +134,26 @@ class CompilerParser(Parser):
 
     @_('NUM')
     def value(self, p):
-        return self.codeGenerator.generate_constant(p.NUM), "constant", p.NUM
+        val_content = p.NUM
+        return ValueAttr(self.code_generator.generate_constant(val_content), "const", val_content)
 
     @_('identifier')
     def value(self, p):
-        asm, variable_name = p.identifier
+        asm, var_name = p.identifier.var_address_asm, p.identifier.var_name
         try:
-            asm += self.codeGenerator.load_variable_value(variable_name)
+            asm += self.code_generator.load_variable_value(var_name)
         except Exception as e:
-            raise CompilerException("unknown", e)
-        return asm, "variable", variable_name
+            raise CompilerException(e)
+        return ValueAttr(asm, "var", var_name)
 
     @_('PIDENTIFIER')
     def identifier(self, p):
         try:
-            return self.codeGenerator.load_variable_address(p.PIDENTIFIER), p.PIDENTIFIER
+            var_name = p.PIDENTIFIER
+            asm = self.code_generator.get_var_address(var_name)
+            return IdentifierAttr(asm, var_name)
         except Exception as e:
-            raise CompilerException(p.lineno, e)
+            raise CompilerException(e, p.lineno)
 
     # @_('PIDENTIFIER "[" PIDENTIFIER "]"')
     # def identifier(self, p):
@@ -181,7 +164,7 @@ class CompilerParser(Parser):
     #     pass
 
 
-if __name__ == '__main__':
+def main():
     lexer = CompilerLexer()
     parser = CompilerParser()
 
@@ -191,14 +174,20 @@ if __name__ == '__main__':
     input_file = sys.argv[1]
     output_file = sys.argv[2]
     with open(input_file) as f:
-        text = f.read()
-    tokenize_res = lexer.tokenize(text)
+        code = f.read()
+    lexer_tokenize = lexer.tokenize(code)
     # print("LEXER RESULT:")
     # for tok in tokenize_res:
     #     print(tok)
     # print("================")
-    result = parser.parse(tokenize_res)
+    result = parser.parse(lexer_tokenize)
+    print(result)
+    result = '\n'.join(result)
     print(parser.symbol_table)
     # print(result)
     with open(output_file, 'w') as f:
         f.write(result)
+
+
+if __name__ == '__main__':
+    main()

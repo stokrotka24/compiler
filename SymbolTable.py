@@ -24,6 +24,9 @@ class SymbolTable(dict):
         super().__init__()
         self.data_offset = 0
 
+    def __repr__(self) -> str:
+        return "<SymbolTable: " + super().__repr__() + ">"
+
     def variable_declaration(self, name):
         if name in self:
             return f"Variable {name} already declared"

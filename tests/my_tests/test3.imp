@@ -1,0 +1,22 @@
+VAR
+    a, b, c, d, e
+BEGIN
+    READ a;
+    READ b;
+    READ c;
+    a ASSIGN a PLUS a;
+    b ASSIGN b PLUS b;
+    c ASSIGN c PLUS c;
+    d ASSIGN 0;
+    d ASSIGN d PLUS a;
+    d ASSIGN d PLUS b;
+    d ASSIGN d PLUS c;
+    d ASSIGN -1000 PLUS d;
+    e ASSIGN 100 PLUS 450;
+    WRITE a;
+    WRITE b;
+    WRITE c;
+    WRITE d;
+    WRITE e;
+    WRITE -5;
+END

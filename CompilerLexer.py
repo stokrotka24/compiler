@@ -68,7 +68,7 @@ class CompilerLexer(Lexer):
         return t
 
     def error(self, t):
-        raise CompilerException(self.lineno - 1, f"Illegal character {t.value[0]}")
+        raise CompilerException(f"Illegal character {t.value[0]}", self.lineno - 1)
 
 
 # TODO rm for release, to test lexer
