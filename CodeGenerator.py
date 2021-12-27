@@ -79,3 +79,21 @@ class CodeGenerator:
             asm.append("ADD g")
 
         return asm
+
+    # REGISTER: a, g
+    def sub(self, value_attr_1, value_attr_2):
+        asm = []
+
+        type0 = value_attr_1.value_type
+        type1 = value_attr_2.value_type
+        if type0 == "const" and type1 == "const":
+            num0 = value_attr_1.value_content
+            num1 = value_attr_2.value_content
+            asm += self.generate_constant(num0 - num1)
+        else:
+            asm += value_attr_1.get_value_asm
+            asm.append("SWAP g")
+            asm += value_attr_2.get_value_asm
+            asm.append("SUB g")
+
+        return asm

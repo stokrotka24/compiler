@@ -1,0 +1,8 @@
+VAR
+    n, p
+BEGIN
+    n ASSIGN 5;
+    p ASSIGN 100;
+    p ASSIGN n MINUS p;
+    WRITE p;
+END
