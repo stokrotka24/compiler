@@ -71,7 +71,7 @@ class CompilerLexer(Lexer):
         raise Exception(f"Illegal character {t.value[0]} in line {self.lineno - 1}")
 
 
-# to test lexer
+# TODO rm for release, to test lexer
 if __name__ == '__main__':
     data = '''
 VAR
