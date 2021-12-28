@@ -1,9 +1,14 @@
 VAR
-    n, p
+    n, p, fikolek, gikolek
 BEGIN
     READ n;
-    p ASSIGN n TIMES -5;
-    WRITE p;
-    n ASSIGN p MINUS 1000;
+    READ p;
+    fikolek ASSIGN p TIMES n;
+    gikolek ASSIGN n TIMES p;
+    WRITE fikolek;
+    WRITE gikolek;
     WRITE n;
+    WRITE p;
+    fikolek ASSIGN -200 PLUS p;
+    WRITE fikolek;
 END

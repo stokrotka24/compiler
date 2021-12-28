@@ -99,11 +99,10 @@ class CompilerParser(Parser):
     def expression(self, p):
         return self.code_generator.mul(p.value0, p.value1)
 
-    #
-    # @_('value DIV value')
-    # def expression(self, p):
-    #     pass
-    #
+    @_('value DIV value')
+    def expression(self, p):
+        return self.code_generator.div(p.value0, p.value1)
+
     # @_('value MOD value')
     # def expression(self, p):
     #     pass

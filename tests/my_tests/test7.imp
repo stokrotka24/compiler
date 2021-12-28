@@ -1,0 +1,27 @@
+(
+1
+-2
+-2
+1
+0
+0
+0
+)
+VAR
+    a, b
+BEGIN
+    a ASSIGN 7 DIV 5;
+    WRITE a;
+    a ASSIGN 7 DIV -5;
+    WRITE a;
+    a ASSIGN -7 DIV 5;
+    WRITE a;
+    a ASSIGN -7 DIV -5;
+    WRITE a;
+    a ASSIGN 0 DIV 0;
+    WRITE a;
+    a ASSIGN 7 DIV 0;
+    WRITE a;
+    a ASSIGN -7 DIV 0;
+    WRITE a;
+END
