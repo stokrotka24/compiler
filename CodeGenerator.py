@@ -51,10 +51,10 @@ class CodeGenerator:
         self.symbol_table[var_name].initialized = True
         return asm
 
-    # REGISTER: a, g
+    # REGISTER: a, h
     def assign(self, identifier_attr, assigned_expression_asm):
         asm = []
-        reg_aux = 'g'
+        reg_aux = 'h'
 
         asm += assigned_expression_asm
         asm.append(f"SWAP {reg_aux}")
