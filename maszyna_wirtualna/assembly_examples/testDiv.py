@@ -5,8 +5,7 @@ asm.append("GET")
 asm.append("SWAP e")  # w e zapamiętujemy dzielnik
 asm.append("GET")
 asm.append("SWAP b")
-asm.append("SWAP e")
-# w a mamy dzielnik, w b mamy dzielną, w e mamy dzielnik
+# w b mamy dzielną, w e mamy dzielnik
 
 asm.append("RESET c")
 asm.append("DEC c")  # -1 w c
@@ -14,13 +13,13 @@ asm.append("DEC c")  # -1 w c
 asm.append("RESET d")
 asm.append("INC d")  # 1 w d do mnozenia przez 2
 
-asm.append("JUMP 4")
+asm.append("JUMP 5")
 
 asm.append("SWAP e")
 asm.append("SHIFT d")
 asm.append("INC c")
-
 asm.append("SWAP e")
+
 asm.append("RESET a")
 asm.append("ADD e")
 asm.append("SUB b")
@@ -30,9 +29,9 @@ asm.append("JZERO -8")
 asm.append("SWAP e")
 asm.append("DEC d")
 asm.append("DEC d")
-asm.append("SHIFT d")  # podziel przez 2
+asm.append("SHIFT d")  # podziel dzielnik przez 2
 asm.append("SWAP b")
-asm.append("SWAP e")
+asm.append("SWAP e")  # zamień dzielną i dzielnik na miejsca
 
 asm.append("RESET a")
 asm.append("ADD e")
