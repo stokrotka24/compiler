@@ -3,6 +3,6 @@ VAR
 BEGIN
     n ASSIGN 5;
     p ASSIGN 100;
-    p ASSIGN n MINUS p;
+    p ASSIGN 50 MINUS 50;
     WRITE p;
 END

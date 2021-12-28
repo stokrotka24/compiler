@@ -1,0 +1,9 @@
+VAR
+    n, p
+BEGIN
+    READ n;
+    p ASSIGN n TIMES -5;
+    WRITE p;
+    n ASSIGN p MINUS 1000;
+    WRITE n;
+END

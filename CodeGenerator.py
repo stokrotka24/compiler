@@ -66,16 +66,16 @@ class CodeGenerator:
     def add(self, value_attr_1, value_attr_2):
         asm = []
 
-        type0 = value_attr_1.value_type
-        type1 = value_attr_2.value_type
-        if type0 == "const" and type1 == "const":
-            num0 = value_attr_1.value_content
-            num1 = value_attr_2.value_content
-            asm += self.generate_constant(num0 + num1)
+        type1 = value_attr_1.value_type
+        type2 = value_attr_2.value_type
+        if type1 == "const" and type2 == "const":
+            const1 = value_attr_1.value_content
+            const2 = value_attr_2.value_content
+            asm += self.generate_constant(const1 + const2)
         else:
-            asm += value_attr_1.get_value_asm
-            asm.append("SWAP g")
             asm += value_attr_2.get_value_asm
+            asm.append("SWAP g")
+            asm += value_attr_1.get_value_asm
             asm.append("ADD g")
 
         return asm
@@ -84,16 +84,56 @@ class CodeGenerator:
     def sub(self, value_attr_1, value_attr_2):
         asm = []
 
-        type0 = value_attr_1.value_type
-        type1 = value_attr_2.value_type
-        if type0 == "const" and type1 == "const":
-            num0 = value_attr_1.value_content
-            num1 = value_attr_2.value_content
-            asm += self.generate_constant(num0 - num1)
+        type1 = value_attr_1.value_type
+        type2 = value_attr_2.value_type
+        if type1 == "const" and type2 == "const":
+            const1 = value_attr_1.value_content
+            const2 = value_attr_2.value_content
+            asm += self.generate_constant(const1 - const2)
         else:
-            asm += value_attr_1.get_value_asm
-            asm.append("SWAP g")
             asm += value_attr_2.get_value_asm
+            asm.append("SWAP g")
+            asm += value_attr_1.get_value_asm
             asm.append("SUB g")
 
+        return asm
+
+    # REGISTER: a, b, c, g
+    def mul(self, value_attr_1, value_attr_2):
+        asm = []
+
+        type1 = value_attr_1.value_type
+        type2 = value_attr_2.value_type
+        if type1 == "const" and type2 == "const":
+            const1 = value_attr_1.value_content
+            const2 = value_attr_2.value_content
+            asm += self.generate_constant(const1 * const2)
+        elif type1 == "var" and type2 == "const":
+            const = value_attr_2.value_content
+            if const == 0:
+                asm.append("RESET a")
+            else:
+                instr = "ADD" if const >= 0 else "SUB"
+                asm += value_attr_1.get_value_asm
+                asm.append("SWAP g")  # value of var saved in register g
+                asm.append("RESET a")
+                asm.append(f"{instr} g")
+                asm.append("RESET b")
+                asm.append("RESET c")
+                binary = f'{abs(const):b}'
+                n = len(binary)
+                first_one_read = False
+                for i in range(n - 1, -1, -1):
+                    if binary[i] == '1':
+                        if not first_one_read:
+                            first_one_read = True
+                            if i != n - 1:  # because we don't need to multiply by 1
+                                asm.append("SHIFT c")
+                        else:
+                            asm.append("SWAP b")
+                            asm.append("RESET a")
+                            asm.append(f"{instr} g")
+                            asm.append("SHIFT c")
+                            asm.append("ADD b")
+                    asm.append("INC c")
         return asm
