@@ -74,7 +74,7 @@ class CompilerParser(Parser):
     @_('READ identifier ";"')
     def command(self, p):
         asm, var_name = p.identifier.var_address_asm, p.identifier.var_name
-        asm += self.code_generator.store_variable_value(var_name)
+        asm += self.code_generator.store_var_value(var_name)
         return asm
 
     @_('WRITE value ";"')
@@ -135,13 +135,13 @@ class CompilerParser(Parser):
     @_('NUM')
     def value(self, p):
         val_content = p.NUM
-        return ValueAttr(self.code_generator.generate_constant(val_content), "const", val_content)
+        return ValueAttr(self.code_generator.generate_const(val_content), "const", val_content)
 
     @_('identifier')
     def value(self, p):
         asm, var_name = p.identifier.var_address_asm, p.identifier.var_name
         try:
-            asm += self.code_generator.load_variable_value(var_name)
+            asm += self.code_generator.load_var_value(var_name)
         except Exception as e:
             raise CompilerException(e)
         return ValueAttr(asm, "var", var_name)
