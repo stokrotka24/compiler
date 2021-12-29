@@ -1,0 +1,15 @@
+VAR
+    n, p
+BEGIN
+n ASSIGN 1;
+REPEAT
+    WRITE n;
+    n ASSIGN n PLUS 1;
+    p ASSIGN 1;
+    REPEAT
+        WRITE p;
+        p ASSIGN p MINUS 1;
+    UNTIL p LE -4;
+UNTIL n GE 10;
+WRITE -1;
+END

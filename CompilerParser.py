@@ -56,10 +56,10 @@ class CompilerParser(Parser):
     def command(self, p):
         return self.code_generator.while_do(p.condition, p.commands)
 
-    # @_('REPEAT commands UNTIL condition ";"')
-    # def command(self, p):
-    #     pass
-    #
+    @_('REPEAT commands UNTIL condition ";"')
+    def command(self, p):
+        return self.code_generator.repeat_until(p.condition, p.commands)
+
     # @_('FOR PIDENTIFIER FROM value TO value DO commands ENDFOR')
     # def command(self, p):
     #     pass

@@ -1,0 +1,10 @@
+VAR
+    n
+BEGIN
+n ASSIGN 1;
+REPEAT
+    WRITE n;
+    n ASSIGN n PLUS 1;
+UNTIL n GE 10;
+WRITE -1;
+END

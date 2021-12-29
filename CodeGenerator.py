@@ -503,7 +503,7 @@ class CodeGenerator:
     def if_then(self, cond_attr, commands_asm):
         asm = []
         asm += cond_attr.get_difference_asm  # now in reg a is diff: val2 - val1
-        asm += self.get_condition_asm(cond_attr.condition_type, len(commands_asm))
+        asm += self.condition_false_forward_asm(cond_attr.condition_type, len(commands_asm))
         asm += commands_asm
 
         return asm
@@ -511,14 +511,14 @@ class CodeGenerator:
     def if_then_else(self, cond_attr, commands1_asm, commands2_asm):
         asm = []
         asm += cond_attr.get_difference_asm  # now in reg a is diff: val2 - val1
-        asm += self.get_condition_asm(cond_attr.condition_type, len(commands1_asm) + 1)
+        asm += self.condition_false_forward_asm(cond_attr.condition_type, len(commands1_asm) + 1)
         asm += commands1_asm
         asm.append(f"JUMP {len(commands2_asm) + 1}")
         asm += commands2_asm
 
         return asm
 
-    def get_condition_asm(self, condition_type, commands_asm_len):
+    def condition_false_forward_asm(self, condition_type, commands_asm_len):
         if condition_type == "EQ":
             return [f"JPOS {commands_asm_len + 2}", f"JNEG {commands_asm_len + 1}"]
         elif condition_type == "NEQ":
@@ -534,11 +534,36 @@ class CodeGenerator:
         else:
             raise Exception(f"Inproper condition type: {condition_type}")
 
+    def condition_false_back_asm(self, condition_type, commands_asm_len):
+        if condition_type == "EQ":
+            return [f"JPOS -{commands_asm_len}", f"JNEG -{commands_asm_len + 1}"]
+        elif condition_type == "NEQ":
+            return [f"JZERO -{commands_asm_len}"]
+        elif condition_type == "LE":
+            return [f"JNEG -{commands_asm_len}", f"JZERO -{commands_asm_len + 1}"]
+        elif condition_type == "GE":
+            return [f"JPOS -{commands_asm_len}", f"JZERO -{commands_asm_len + 1}"]
+        elif condition_type == "LEQ":
+            return [f"JNEG -{commands_asm_len}"]
+        elif condition_type == "GEQ":
+            return [f"JPOS -{commands_asm_len}"]
+        else:
+            raise Exception(f"Inproper condition type: {condition_type}")
+
     def while_do(self, cond_attr, commands_asm):
         asm = []
         asm += cond_attr.get_difference_asm
-        asm += self.get_condition_asm(cond_attr.condition_type, len(commands_asm) + 1)
+        asm += self.condition_false_forward_asm(cond_attr.condition_type, len(commands_asm) + 1)
         asm += commands_asm
         asm.append(f"JUMP -{len(asm) + 1}")
 
         return asm
+
+    def repeat_until(self, cond_attr, commands_asm):
+        asm = []
+        asm += commands_asm
+        asm += cond_attr.get_difference_asm
+        asm += self.condition_false_back_asm(cond_attr.condition_type, len(asm))
+
+        return asm
+

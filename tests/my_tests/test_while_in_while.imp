@@ -1,0 +1,15 @@
+VAR
+    n, p
+BEGIN
+n ASSIGN 1;
+WHILE n LEQ 10 DO
+    WRITE n;
+    n ASSIGN n PLUS 1;
+    p ASSIGN 1;
+    WHILE p GE -4 DO
+        p ASSIGN p MINUS 1;
+        WRITE p;
+    ENDWHILE
+ENDWHILE
+WRITE -1;
+END
