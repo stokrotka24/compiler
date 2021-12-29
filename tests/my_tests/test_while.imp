@@ -1,0 +1,10 @@
+VAR
+    n
+BEGIN
+n ASSIGN 1;
+WHILE n LEQ 10 DO
+    WRITE n;
+    n ASSIGN n PLUS 1;
+ENDWHILE
+WRITE -1;
+END

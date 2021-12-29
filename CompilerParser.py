@@ -52,10 +52,10 @@ class CompilerParser(Parser):
     def command(self, p):
         return self.code_generator.if_then(p.condition, p.commands)
 
-    # @_('WHILE condition DO commands ENDWHILE')
-    # def command(self, p):
-    #     pass
-    #
+    @_('WHILE condition DO commands ENDWHILE')
+    def command(self, p):
+        return self.code_generator.while_do(p.condition, p.commands)
+
     # @_('REPEAT commands UNTIL condition ";"')
     # def command(self, p):
     #     pass

@@ -533,3 +533,12 @@ class CodeGenerator:
             return [f"JPOS {commands_asm_len + 1}"]
         else:
             raise Exception(f"Inproper condition type: {condition_type}")
+
+    def while_do(self, cond_attr, commands_asm):
+        asm = []
+        asm += cond_attr.get_difference_asm
+        asm += self.get_condition_asm(cond_attr.condition_type, len(commands_asm) + 1)
+        asm += commands_asm
+        asm.append(f"JUMP -{len(asm) + 1}")
+
+        return asm

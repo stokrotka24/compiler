@@ -19,4 +19,10 @@ BEGIN
     WRITE c;
     c ASSIGN a MOD b;
     WRITE c;
+    a ASSIGN 7;
+    b ASSIGN -6;
+    c ASSIGN a DIV b;
+    WRITE c;
+    c ASSIGN a MOD b;
+    WRITE c;
 END
