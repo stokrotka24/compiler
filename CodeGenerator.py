@@ -275,6 +275,7 @@ class CodeGenerator:
 
         return asm
 
+    # REGISTER: a, b, c, d, e, f, g
     def div(self, value_attr_1, value_attr_2):
         asm = []
 
@@ -378,6 +379,7 @@ class CodeGenerator:
 
         return asm
 
+    # REGISTER: a, b, c, d, e, f, g, h
     def mod(self, value_attr_1, value_attr_2):
         asm = []
 
@@ -497,3 +499,27 @@ class CodeGenerator:
         asm.append("SWAP e")  # CASE: dzielna nieujemna, dzielnik nieujemny
 
         return asm
+
+    def if_then(self, cond_attr, commands_asm):
+        asm = []
+        asm += cond_attr.get_difference_asm  # now in reg a is diff: val2 - val1
+        asm += self.get_condition_asm(cond_attr.condition_type, len(commands_asm))
+        asm += commands_asm
+
+        return asm
+
+    def get_condition_asm(self, condition_type, commands_asm_len):
+        if condition_type == "EQ":
+            return [f"JPOS {commands_asm_len + 2}", f"JNEG {commands_asm_len + 1}"]
+        elif condition_type == "NEQ":
+            return [f"JZERO {commands_asm_len + 1}"]
+        elif condition_type == "LE":
+            return [f"JNEG {commands_asm_len + 2}", f"JZERO {commands_asm_len + 1}"]
+        elif condition_type == "GE":
+            return [f"JPOS {commands_asm_len + 2}", f"JZERO {commands_asm_len + 1}"]
+        elif condition_type == "LEQ":
+            return [f"JNEG {commands_asm_len + 1}"]
+        elif condition_type == "GEQ":
+            return [f"JPOS {commands_asm_len + 1}"]
+        else:
+            raise Exception(f"Inproper condition type: {condition_type}")

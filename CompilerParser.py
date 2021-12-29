@@ -5,7 +5,7 @@ from CompilerLexer import CompilerLexer
 from CompilerException import CompilerException
 from CodeGenerator import CodeGenerator
 from SymbolTable import SymbolTable, Variable
-from ParserAttrs import IdentifierAttr, ValueAttr
+from ParserAttrs import IdentifierAttr, ValueAttr, ConditionAttr
 
 
 # noinspection PyUnresolvedReferences
@@ -26,13 +26,11 @@ class CompilerParser(Parser):
         if message:
             raise CompilerException(message, p.lineno)
 
-    # @_('declarations "," PIDENTIFIER "[" NUM ":" NUM "]"')
+    # @_('declarations "," PIDENTIFIER "[" NUM ":" NUM "]"', 'PIDENTIFIER "[" NUM ":" NUM "]"')
     # def declarations(self, p):
-    #     pass
-    #
-    # @_('PIDENTIFIER "[" NUM ":" NUM "]"')
-    # def declarations(self, p):
-    #     pass
+    #     message = self.symbol_table.array_declaration(p.PIDENTIFIER, p.NUM0, p.NUM1)
+    #     if message:
+    #         raise CompilerException(message, p.lineno)
 
     @_('commands command')
     def commands(self, p):
@@ -51,10 +49,10 @@ class CompilerParser(Parser):
     # def command(self, p):
     #     pass
     #
-    # @_('IF condition THEN commands ENDIF')
-    # def command(self, p):
-    #     pass
-    #
+    @_('IF condition THEN commands ENDIF')
+    def command(self, p):
+        return self.code_generator.if_then(p.condition, p.commands)
+
     # @_('WHILE condition DO commands ENDWHILE')
     # def command(self, p):
     #     pass
@@ -107,30 +105,29 @@ class CompilerParser(Parser):
     def expression(self, p):
         return self.code_generator.mod(p.value0, p.value1)
 
-    #
-    # @_('value EQ value')
-    # def condition(self, p):
-    #     pass
-    #
-    # @_('value NEQ value')
-    # def condition(self, p):
-    #     pass
-    #
-    # @_('value LE value')
-    # def condition(self, p):
-    #     pass
-    #
-    # @_('value GE value')
-    # def condition(self, p):
-    #     pass
-    #
-    # @_('value LEQ value')
-    # def condition(self, p):
-    #     pass
-    #
-    # @_('value GEQ value')
-    # def condition(self, p):
-    #     pass
+    @_('value EQ value')
+    def condition(self, p):
+        return ConditionAttr(self.code_generator.sub(p.value1, p.value0), "EQ")
+
+    @_('value NEQ value')
+    def condition(self, p):
+        return ConditionAttr(self.code_generator.sub(p.value1, p.value0), "NEQ")
+
+    @_('value LE value')
+    def condition(self, p):
+        return ConditionAttr(self.code_generator.sub(p.value1, p.value0), "LE")
+
+    @_('value GE value')
+    def condition(self, p):
+        return ConditionAttr(self.code_generator.sub(p.value1, p.value0), "GE")
+
+    @_('value LEQ value')
+    def condition(self, p):
+        return ConditionAttr(self.code_generator.sub(p.value1, p.value0), "LEQ")
+
+    @_('value GEQ value')
+    def condition(self, p):
+        return ConditionAttr(self.code_generator.sub(p.value1, p.value0), "GEQ")
 
     @_('NUM')
     def value(self, p):
@@ -163,6 +160,9 @@ class CompilerParser(Parser):
     # def identifier(self, p):
     #     pass
 
+    def error(self, p):
+        raise CompilerException(f"Syntax error at token {p.type}", p.lineno)
+
 
 def main():
     lexer = CompilerLexer()
@@ -180,7 +180,11 @@ def main():
     # for tok in tokenize_res:
     #     print(tok)
     # print("================")
-    result = parser.parse(lexer_tokenize)
+    try:
+        result = parser.parse(lexer_tokenize)
+    except CompilerException as ex:
+        print(ex)
+        sys.exit()
     print(result)
     result = '\n'.join(result)
     print(parser.symbol_table)

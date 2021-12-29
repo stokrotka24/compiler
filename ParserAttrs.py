@@ -9,3 +9,9 @@ class ValueAttr:
         self.get_value_asm = get_value_asm
         self.value_type = value_type
         self.value_content = value_content
+
+
+class ConditionAttr:
+    def __init__(self, get_difference_asm, condition_type):
+        self.get_difference_asm = get_difference_asm
+        self.condition_type = condition_type

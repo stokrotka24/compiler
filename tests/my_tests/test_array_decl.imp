@@ -1,0 +1,5 @@
+VAR
+    a[90:-90]
+BEGIN
+    WRITE 300;
+END

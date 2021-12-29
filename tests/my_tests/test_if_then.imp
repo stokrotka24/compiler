@@ -1,0 +1,13 @@
+VAR
+    n
+BEGIN
+READ n;
+IF n GEQ 1 THEN
+    WRITE 1;
+    n ASSIGN 10 MOD -3;
+    WRITE n;
+    READ n;
+    WRITE n;
+ENDIF
+WRITE 1000;
+END
