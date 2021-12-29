@@ -1,0 +1,33 @@
+(
+2
+-3
+3
+-2
+0
+0
+0
+0
+0
+)
+VAR
+    a, b
+BEGIN
+    a ASSIGN 7 MOD 5;
+    WRITE a;
+    a ASSIGN 7 MOD -5;
+    WRITE a;
+    a ASSIGN -7 MOD 5;
+    WRITE a;
+    a ASSIGN -7 MOD -5;
+    WRITE a;
+    a ASSIGN 0 MOD 0;
+    WRITE a;
+    a ASSIGN 7 MOD 0;
+    WRITE a;
+    a ASSIGN -7 MOD 0;
+    WRITE a;
+    a ASSIGN 0 MOD 7;
+    WRITE a;
+    a ASSIGN 0 MOD -7;
+    WRITE a;
+END

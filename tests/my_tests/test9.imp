@@ -1,0 +1,71 @@
+(
+1
+-2
+-2
+1
+0
+-1
+-1
+0
+0
+0
+0
+0
+0
+)
+VAR
+    a, b
+BEGIN
+    a ASSIGN 7;
+    b ASSIGN 5;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN 7;
+    b ASSIGN -5;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN -7;
+    b ASSIGN 5;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN -7;
+    b ASSIGN -5;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN 5;
+    b ASSIGN 7;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN 5;
+    b ASSIGN -7;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN -5;
+    b ASSIGN 7;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN -5;
+    b ASSIGN -7;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN -7;
+    b ASSIGN 0;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN 7;
+    b ASSIGN 0;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN 0;
+    b ASSIGN 0;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN 0;
+    b ASSIGN -7;
+    a ASSIGN a DIV b;
+    WRITE a;
+    a ASSIGN 0;
+    b ASSIGN 7;
+    a ASSIGN a DIV b;
+    WRITE a;
+END

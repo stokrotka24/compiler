@@ -103,9 +103,10 @@ class CompilerParser(Parser):
     def expression(self, p):
         return self.code_generator.div(p.value0, p.value1)
 
-    # @_('value MOD value')
-    # def expression(self, p):
-    #     pass
+    @_('value MOD value')
+    def expression(self, p):
+        return self.code_generator.mod(p.value0, p.value1)
+
     #
     # @_('value EQ value')
     # def condition(self, p):
