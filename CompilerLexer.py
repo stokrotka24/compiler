@@ -1,4 +1,5 @@
 from sly import Lexer
+from CompilerException import CompilerException
 
 
 # noinspection PyUnresolvedReferences,PyUnboundLocalVariable

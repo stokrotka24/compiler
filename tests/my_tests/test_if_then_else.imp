@@ -1,0 +1,15 @@
+VAR
+    a, b
+BEGIN
+    READ a;
+    READ b;
+    IF a LEQ b THEN
+        a ASSIGN b MOD a;
+        WRITE a;
+        WRITE -123456;
+    ELSE
+        a ASSIGN a MOD b;
+        WRITE a;
+    ENDIF
+    WRITE 1000;
+END

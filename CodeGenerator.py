@@ -508,6 +508,16 @@ class CodeGenerator:
 
         return asm
 
+    def if_then_else(self, cond_attr, commands1_asm, commands2_asm):
+        asm = []
+        asm += cond_attr.get_difference_asm  # now in reg a is diff: val2 - val1
+        asm += self.get_condition_asm(cond_attr.condition_type, len(commands1_asm) + 1)
+        asm += commands1_asm
+        asm.append(f"JUMP {len(commands2_asm) + 1}")
+        asm += commands2_asm
+
+        return asm
+
     def get_condition_asm(self, condition_type, commands_asm_len):
         if condition_type == "EQ":
             return [f"JPOS {commands_asm_len + 2}", f"JNEG {commands_asm_len + 1}"]

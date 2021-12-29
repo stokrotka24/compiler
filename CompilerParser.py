@@ -44,11 +44,10 @@ class CompilerParser(Parser):
     def command(self, p):
         return self.code_generator.assign(p.identifier, p.expression)
 
-    #
-    # @_('IF condition THEN commands ELSE commands ENDIF')
-    # def command(self, p):
-    #     pass
-    #
+    @_('IF condition THEN commands ELSE commands ENDIF')
+    def command(self, p):
+        return self.code_generator.if_then_else(p.condition, p.commands0, p.commands1)
+
     @_('IF condition THEN commands ENDIF')
     def command(self, p):
         return self.code_generator.if_then(p.condition, p.commands)

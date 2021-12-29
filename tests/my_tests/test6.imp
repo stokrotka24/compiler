@@ -1,0 +1,39 @@
+(
+-3
+-3
+-6
+6
+3
+3
+6
+0
+3
+1
+3
+)
+VAR
+    a, b
+BEGIN
+    b ASSIGN -1 TIMES 3;
+    WRITE b;
+    b ASSIGN 1 TIMES -3;
+    WRITE b;
+    a ASSIGN b TIMES 2;
+    WRITE a;
+    a ASSIGN b TIMES -2;
+    WRITE a;
+    b ASSIGN 1 TIMES 3;
+    WRITE b;
+    b ASSIGN -1 TIMES -3;
+    WRITE b;
+    a ASSIGN b TIMES 2;
+    WRITE a;
+    a ASSIGN b TIMES 0;
+    WRITE a;
+    a ASSIGN 3;
+    WRITE a;
+    b ASSIGN 1;
+    WRITE b;
+    a ASSIGN a TIMES b;
+    WRITE a;
+END
