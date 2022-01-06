@@ -1,0 +1,8 @@
+VAR
+    n, a[1:5]
+BEGIN
+    READ n;
+    READ a[n];
+    WRITE n;
+    WRITE a[n];
+END

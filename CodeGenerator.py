@@ -1,3 +1,5 @@
+from SymbolTable import Variable, Array
+
 class CodeGenerator:
     def __init__(self, symbol_table):
         self.symbol_table = symbol_table
@@ -25,13 +27,68 @@ class CodeGenerator:
         if var_name not in self.symbol_table:
             raise Exception(f"Access to undeclared variable {var_name}")
 
-        return self.generate_const(self.symbol_table[var_name].address)
+        variable = self.symbol_table[var_name]
+        if type(variable) is Array:
+            raise Exception(f"{var_name} is an array, not a variable")
+
+        return self.generate_const(variable.address)
+
+    # REGISTER: - + generate_const
+    def get_arr_elem_address(self, arr_name, arr_index):
+        if arr_name not in self.symbol_table:
+            raise Exception(f"Access to undeclared array {arr_name}")
+        arr = self.symbol_table[arr_name]
+
+        if type(arr) is Variable:
+            raise Exception(f"{arr_name} is a variable, not an array")
+
+        if arr_index < arr.first_index or arr_index > arr.last_index:
+            raise Exception(f"Access to index {arr_index} in array {arr_name}, which has range [{arr.first_index}, {arr.last_index}]")
+
+        return self.generate_const(arr.address + arr_index - arr.first_index)
+
+    def get_arr_elem_address_with_var_index(self, arr_name, var_name):
+        if arr_name not in self.symbol_table:
+            raise Exception(f"Access to undeclared array {arr_name}")
+
+        arr = self.symbol_table[arr_name]
+        if type(arr) is Variable:
+            raise Exception(f"{arr_name} is a variable, not an array")
+
+        asm = []
+
+        asm += self.get_var_address(var_name)  # REGISTER a, b
+        asm += self.load_var_value(var_name)  # REGISTER a, h
+        asm.append("SWAP h") # save value of var in register h
+
+        asm += self.generate_const(arr.first_index)  # REGISTER a, b
+
+        # calculate order of elem array[var's value] in array
+        asm.append("SUB h")
+        asm.append("SWAP h")
+        asm.append("RESET a")
+        asm.append("SUB h")
+
+        asm.append("SWAP h") # save order of elem array[var's value] in array in register h
+
+        asm += self.generate_const(arr.address)  # REGISTER a, b
+        asm.append("ADD h")
+        return asm
 
     # REGISTER: a, h
     def load_var_value(self, var_name):
         if not self.symbol_table[var_name].initialized:
             raise Exception(f"Access to uninitialized variable {var_name}")
 
+        asm = []
+        reg_address = 'h'
+
+        asm.append(f"SWAP {reg_address}")
+        asm.append(f"LOAD {reg_address}")
+        return asm
+
+    # REGISTER: a, h
+    def load_arr_elem_value(self):
         asm = []
         reg_address = 'h'
 
@@ -52,20 +109,35 @@ class CodeGenerator:
         return asm
 
     # REGISTER: a, h
+    def store_arr_elem_value(self):
+        asm = []
+        reg_address = 'h'
+
+        asm.append(f"SWAP {reg_address}")
+        asm.append("GET")
+        asm.append(f"STORE {reg_address}")
+        return asm
+
+
+    # REGISTER: a, h
     def assign(self, identifier_attr, assigned_expression_asm):
         asm = []
-        reg_aux = 'h'
+        reg_aux = 'd'  # can't use h, because in a[n] ASSIGN 1, h is used to do a[n]
 
         asm += assigned_expression_asm
         asm.append(f"SWAP {reg_aux}")
 
-        var_address_asm, var_name = identifier_attr.var_address_asm, identifier_attr.var_name
-        asm += var_address_asm
+        identifier_address_asm = identifier_attr.identifier_address_asm
+        asm += identifier_address_asm
         asm.append(f"SWAP {reg_aux}")
-
         asm.append(f"STORE {reg_aux}")
 
-        self.symbol_table[var_name].initialized = True
+        identifier_type = identifier_attr.identifier_type
+
+        if identifier_type == "var":
+            var_name = identifier_attr.identifier_name
+            self.symbol_table[var_name].initialized = True
+
         return asm
 
     # REGISTER: a, g

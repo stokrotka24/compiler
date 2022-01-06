@@ -1,0 +1,14 @@
+VAR
+    n, a[1:200]
+BEGIN
+    READ a[1];
+    WRITE a[1];
+    READ a[200];
+    WRITE a[200];
+    n ASSIGN a[200];
+    WRITE n;
+    n ASSIGN a[1] PLUS a[200];
+    WRITE n;
+    (WRITE a[201];)
+    WRITE a[101];
+END

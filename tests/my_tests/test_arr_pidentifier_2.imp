@@ -1,0 +1,10 @@
+VAR
+    n, a[1:5]
+BEGIN
+    READ n;
+    WRITE n;
+    a[n] ASSIGN 90;
+    WRITE a[n];
+    a[5] ASSIGN 123;
+    WRITE a[5];
+END

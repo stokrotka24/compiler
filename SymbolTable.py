@@ -35,7 +35,7 @@ class SymbolTable(dict):
 
     def array_declaration(self, name, first_index, last_index):
         if name in self:
-            return f"Variable {name} already declared"
+            return f"Array {name} already declared"
         if first_index > last_index:
             return f"First index of array can't be greater then last index of array"
         self[name] = Array(self.data_offset, first_index, last_index)

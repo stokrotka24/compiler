@@ -1,0 +1,11 @@
+VAR
+    n, a[1:5]
+BEGIN
+    READ n;
+    WHILE n LE 10 DO
+        WRITE n;
+        a[n] ASSIGN n TIMES 10;
+        WRITE a[n];
+        n ASSIGN n PLUS 1;
+    ENDWHILE
+END

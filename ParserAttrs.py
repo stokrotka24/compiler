@@ -1,14 +1,15 @@
 class IdentifierAttr:
-    def __init__(self, var_address_asm, var_name):
-        self.var_address_asm = var_address_asm
-        self.var_name = var_name
+    def __init__(self, identifier_address_asm, identifier_type, identifier_name):
+        self.identifier_address_asm = identifier_address_asm
+        self.identifier_type = identifier_type
+        self.identifier_name = identifier_name
 
 
 class ValueAttr:
     def __init__(self, get_value_asm, value_type, value_content):
         self.get_value_asm = get_value_asm
         self.value_type = value_type
-        self.value_content = value_content
+        self.value_content = value_content  # number if value_type is "const", variable/array name if "var", "arr"
 
 
 class ConditionAttr:

@@ -26,11 +26,11 @@ class CompilerParser(Parser):
         if message:
             raise CompilerException(message, p.lineno)
 
-    # @_('declarations "," PIDENTIFIER "[" NUM ":" NUM "]"', 'PIDENTIFIER "[" NUM ":" NUM "]"')
-    # def declarations(self, p):
-    #     message = self.symbol_table.array_declaration(p.PIDENTIFIER, p.NUM0, p.NUM1)
-    #     if message:
-    #         raise CompilerException(message, p.lineno)
+    @_('declarations "," PIDENTIFIER "[" NUM ":" NUM "]"', 'PIDENTIFIER "[" NUM ":" NUM "]"')
+    def declarations(self, p):
+        message = self.symbol_table.array_declaration(p.PIDENTIFIER, p.NUM0, p.NUM1)
+        if message:
+            raise CompilerException(message, p.lineno)
 
     @_('commands command')
     def commands(self, p):
@@ -70,9 +70,16 @@ class CompilerParser(Parser):
 
     @_('READ identifier ";"')
     def command(self, p):
-        asm, var_name = p.identifier.var_address_asm, p.identifier.var_name
-        asm += self.code_generator.store_var_value(var_name)
-        return asm
+        identifier_type = p.identifier.identifier_type
+
+        if identifier_type == "var":
+            asm, var_name = p.identifier.identifier_address_asm, p.identifier.identifier_name
+            asm += self.code_generator.store_var_value(var_name)
+            return asm
+        elif identifier_type == "arr":
+            asm, arr_name = p.identifier.identifier_address_asm, p.identifier.identifier_name
+            asm += self.code_generator.store_arr_elem_value()
+            return asm
 
     @_('WRITE value ";"')
     def command(self, p):
@@ -135,29 +142,52 @@ class CompilerParser(Parser):
 
     @_('identifier')
     def value(self, p):
-        asm, var_name = p.identifier.var_address_asm, p.identifier.var_name
-        try:
-            asm += self.code_generator.load_var_value(var_name)
-        except Exception as e:
-            raise CompilerException(e)
-        return ValueAttr(asm, "var", var_name)
+        identifier_type = p.identifier.identifier_type
+
+        if identifier_type == "var":
+            asm, var_name = p.identifier.identifier_address_asm, p.identifier.identifier_name
+            try:
+                asm += self.code_generator.load_var_value(var_name)
+            except Exception as e:
+                raise CompilerException(e)
+            return ValueAttr(asm, "var", var_name)
+
+        elif identifier_type == "arr":
+            asm, arr_name = p.identifier.identifier_address_asm, p.identifier.identifier_name
+            asm += self.code_generator.load_arr_elem_value()
+            return ValueAttr(asm, "arr", arr_name)
+
+        raise CompilerException("Unexpected type of identifier")
 
     @_('PIDENTIFIER')
     def identifier(self, p):
         try:
             var_name = p.PIDENTIFIER
             asm = self.code_generator.get_var_address(var_name)
-            return IdentifierAttr(asm, var_name)
+            return IdentifierAttr(asm, "var", var_name)
         except Exception as e:
             raise CompilerException(e, p.lineno)
 
-    # @_('PIDENTIFIER "[" PIDENTIFIER "]"')
-    # def identifier(self, p):
-    #     pass
-    #
-    # @_('PIDENTIFIER "[" NUM "]"')
-    # def identifier(self, p):
-    #     pass
+    @_('PIDENTIFIER "[" PIDENTIFIER "]"')
+    def identifier(self, p):
+        try:
+            arr_name = p.PIDENTIFIER0
+            var_name = p.PIDENTIFIER1
+
+            asm = self.code_generator.get_arr_elem_address_with_var_index(arr_name, var_name)
+            return IdentifierAttr(asm, "arr", arr_name)
+        except Exception as e:
+            raise CompilerException(e, p.lineno)
+
+    @_('PIDENTIFIER "[" NUM "]"')
+    def identifier(self, p):
+        try:
+            arr_name = p.PIDENTIFIER
+            arr_index = p.NUM
+            asm = self.code_generator.get_arr_elem_address(arr_name, arr_index)
+            return IdentifierAttr(asm, "arr", arr_name)
+        except Exception as e:
+            raise CompilerException(e, p.lineno)
 
     def error(self, p):
         raise CompilerException(f"Syntax error at token {p.type}", p.lineno)
