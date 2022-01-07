@@ -5,7 +5,7 @@ from CompilerLexer import CompilerLexer
 from CompilerException import CompilerException
 from CodeGenerator import CodeGenerator
 from SymbolTable import SymbolTable, Variable
-from ParserAttrs import IdentifierAttr, ValueAttr, ConditionAttr
+from ParserAttrs import IdentifierAttr, ValueAttr, ConditionAttr, ForAttr
 
 
 # noinspection PyUnresolvedReferences
@@ -42,7 +42,10 @@ class CompilerParser(Parser):
 
     @_('identifier ASSIGN expression ";"')
     def command(self, p):
-        return self.code_generator.assign(p.identifier, p.expression)
+        try:
+            return self.code_generator.assign(p.identifier, p.expression)
+        except Exception as e:
+            raise CompilerException(e, p.lineno)
 
     @_('IF condition THEN commands ELSE commands ENDIF')
     def command(self, p):
@@ -60,10 +63,24 @@ class CompilerParser(Parser):
     def command(self, p):
         return self.code_generator.repeat_until(p.condition, p.commands)
 
-    # @_('FOR PIDENTIFIER FROM value TO value DO commands ENDFOR')
-    # def command(self, p):
-    #     pass
-    #
+    @_('FOR PIDENTIFIER FROM value TO value')
+    def for_to(self, p):
+        iterator_name = p.PIDENTIFIER
+
+        try:
+            global_var = self.code_generator.init_for(iterator_name)
+        except Exception as e:
+            raise CompilerException(e, p.lineno)
+
+        self.symbol_table[iterator_name].initialized = True
+        return ForAttr(iterator_name, p.value0, p.value1, global_var)
+
+    @_('for_to DO commands ENDFOR')
+    def command(self, p):
+        return self.code_generator.for_to(p.for_to.pidentifier,
+                                          p.for_to.start_value_attr, p.for_to.end_value_attr,
+                                          p.for_to.global_var, p.commands)
+
     # @_('FOR PIDENTIFIER FROM value DOWNTO value DO commands ENDFOR')
     # def command(self, p):
     #     pass
@@ -74,6 +91,9 @@ class CompilerParser(Parser):
 
         if identifier_type == "var":
             asm, var_name = p.identifier.identifier_address_asm, p.identifier.identifier_name
+            if self.symbol_table[var_name].loop_iterator:
+                raise CompilerException(f"Not allowed loop iterator {var_name} modification", p.lineno)
+
             asm += self.code_generator.store_var_value(var_name)
             return asm
         elif identifier_type == "arr":
@@ -216,6 +236,7 @@ def main():
         sys.exit()
     print(result)
     result = '\n'.join(result)
+    # print(result)
     print(parser.symbol_table)
     # print(result)
     with open(output_file, 'w') as f:

@@ -1,0 +1,70 @@
+VAR
+    n, a[1:10], m
+BEGIN
+    n ASSIGN 10;
+
+    FOR i FROM 1 TO n DO
+        WRITE 345;
+    ENDFOR
+
+    FOR i FROM 1 TO n DO
+        a[i] ASSIGN i;
+        WRITE i;
+    ENDFOR
+
+    WRITE n;
+
+    FOR i FROM 1 TO n DO
+        WRITE i;
+    ENDFOR
+
+    (FOR i FROM 1 TO n DO
+        WRITE i;
+        READ i;
+        WRITE i;
+    ENDFOR
+
+    FOR i FROM 1 TO n DO
+        WRITE i;
+        READ i[1];
+        WRITE i;
+    ENDFOR
+
+    FOR i FROM 1 TO n DO
+        WRITE i;
+        i ASSIGN 4;
+    ENDFOR
+
+    FOR i FROM 1 TO n DO
+        WRITE i;
+        i[3] ASSIGN 4;
+    ENDFOR)
+
+    n ASSIGN -3;
+    m ASSIGN 2;
+    FOR i FROM n TO m DO
+        WRITE i;
+    ENDFOR
+
+    FOR i FROM a[1] TO m DO
+        WRITE i;
+    ENDFOR
+
+    n ASSIGN -100;
+    m ASSIGN -96;
+    FOR i FROM n TO m DO
+        FOR j FROM a[4] TO a[7] DO
+            WRITE i;
+            WRITE j;
+        ENDFOR
+    ENDFOR
+
+    WRITE 22222222;
+    FOR i FROM 1 TO 2 DO
+        FOR i FROM 4 TO 7 DO
+            WRITE i;
+            WRITE 111;
+        ENDFOR
+        WRITE i;
+    ENDFOR
+END

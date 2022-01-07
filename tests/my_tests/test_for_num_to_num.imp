@@ -1,0 +1,31 @@
+VAR
+    n, i, a[1:5]
+BEGIN
+    (FOR i FROM 3 TO 5 DO
+        WRITE 2;
+    ENDFOR)
+
+    READ i;
+
+    FOR i FROM 1 TO 3 DO
+        FOR j FROM -1 TO 2 DO
+            WRITE i;
+            WRITE j;
+        ENDFOR
+    ENDFOR
+
+    WRITE 1000000;
+
+    FOR i FROM -10 TO 5 DO
+        WRITE i;
+    ENDFOR
+
+    WRITE i;
+
+    FOR i FROM 1 TO 5 DO
+        a[i] ASSIGN i;
+    ENDFOR
+    FOR i FROM 1 TO 5 DO
+        WRITE a[i];
+    ENDFOR
+END

@@ -16,3 +16,10 @@ class ConditionAttr:
     def __init__(self, get_difference_asm, condition_type):
         self.get_difference_asm = get_difference_asm
         self.condition_type = condition_type
+
+class ForAttr:
+    def __init__(self, pidentifier, start_value_attr, end_value_attr, global_var):
+        self.pidentifier = pidentifier
+        self.start_value_attr = start_value_attr
+        self.end_value_attr = end_value_attr
+        self.global_var = global_var
