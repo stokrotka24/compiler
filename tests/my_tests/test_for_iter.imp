@@ -1,0 +1,9 @@
+VAR
+   i, n
+BEGIN
+    READ i;
+    WRITE i;
+    FOR i FROM 5 TO i DO
+        WRITE 3;
+    ENDFOR
+END

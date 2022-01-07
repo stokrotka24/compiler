@@ -666,16 +666,20 @@ class CodeGenerator:
             start_value = start_value_attr.value_content
             end_value = end_value_attr.value_content
 
-            if start_value < end_value:
+            if start_value <= end_value:
                 for i_value in range(start_value, end_value + 1):
-                    asm += self.generate_const(i_value)
-                    asm.append(f"SWAP {reg_address}")
                     asm += self.generate_const(iterator_address)
                     asm.append(f"SWAP {reg_address}")
+                    asm += self.generate_const(i_value)
                     asm.append(f"STORE {reg_address}")
                     asm += commands_asm
 
         else:
+            if type1 == "var" and start_value_attr.value_content == iterator_name:
+                raise Exception(f"Iterator {iterator_name} can't be as one of range of loop")
+            if type2 == "var" and end_value_attr.value_content == iterator_name:
+                raise Exception(f"Iterator {iterator_name} can't be as one of range of loop")
+
             len_commands_asm = len(commands_asm)
 
             gen_it_add = self.generate_const(iterator_address)
@@ -721,6 +725,92 @@ class CodeGenerator:
 
             asm.append(f"SUB {reg_aux}")  # end_value - iterator
             asm.append(f"JNEG {len_commands_asm + 2}")  # omit loop, because iterator > end_value
+
+            asm += commands_asm
+            asm.append(f"JUMP -{9 + len_snippets}")
+
+            del self.symbol_table[lev_name]
+
+        if global_var:
+            self.symbol_table[iterator_name] = global_var
+        else:
+            del self.symbol_table[iterator_name]
+
+        return asm
+
+    def for_downto(self, iterator_name, start_value_attr, end_value_attr, global_var, commands_asm):
+        asm = []
+        reg_aux = 'd'
+        reg_address = 'h'
+
+        iterator_address = self.symbol_table[iterator_name].address
+
+        type1 = start_value_attr.value_type
+        type2 = end_value_attr.value_type
+        if type1 == "const" and type2 == "const":
+            start_value = start_value_attr.value_content
+            end_value = end_value_attr.value_content
+
+            if start_value >= end_value:
+                for i_value in range(start_value, end_value - 1, -1):
+                    asm += self.generate_const(iterator_address)
+                    asm.append(f"SWAP {reg_address}")
+                    asm += self.generate_const(i_value)
+                    asm.append(f"STORE {reg_address}")
+                    asm += commands_asm
+
+        else:
+            pass
+            if type1 == "var" and start_value_attr.value_content == iterator_name:
+                raise Exception(f"Iterator {iterator_name} can't be as one of range of loop")
+            if type2 == "var" and end_value_attr.value_content == iterator_name:
+                raise Exception(f"Iterator {iterator_name} can't be as one of range of loop")
+
+            len_commands_asm = len(commands_asm)
+
+            gen_it_add = self.generate_const(iterator_address)
+            len_gen_it_add = len(gen_it_add)
+
+            lev_address, lev_name = self.symbol_table.loop_end_value_declaration()
+            gen_lev_add = self.generate_const(lev_address)
+            len_gen_lev_add = len(gen_lev_add)
+
+            len_snippets = len_commands_asm + len_gen_it_add + len_gen_lev_add
+
+            asm += start_value_attr.get_value_asm  # REGISTER a, b, h
+            asm.append(f"SWAP {reg_address}")  # save start_value in REGISTER reg_address
+
+            asm += gen_it_add  # generate address of iterator, REGISTER a, b
+            asm.append(f"SWAP {reg_address}")  # start_value in REGISTER a, iterator_address in register reg_address
+            asm.append(f"STORE {reg_address}")  # save start value of iterator
+            asm.append(f"SWAP {reg_aux}")  # save start_value in REGISTER reg_aux
+
+            asm += end_value_attr.get_value_asm  # REGISTER a, b, h
+            asm.append(f"SWAP {reg_address}")  # save end_value in REGISTER reg_address
+
+            asm += gen_lev_add
+            asm.append(f"SWAP {reg_address}")  # lev_address in REGISTER reg_address, end_value in REGISTER a
+            asm.append(f"STORE {reg_address}")  # save value of lev
+
+            asm.append(f"SUB {reg_aux}")  # end_value - start_value
+
+            asm.append(f"JPOS {11 + len_snippets}")  # omit loop, because start_value < end_value
+            asm.append(f"JUMP {10 + len_gen_it_add + len_gen_lev_add}")  # first time we don't need check iterator < end_value
+
+            # check iterator < end_value
+            asm += gen_it_add
+            asm.append(f"SWAP {reg_address}")
+            asm.append(f"LOAD {reg_address}")  # load value of iterator to REGISTER a
+            asm.append("DEC a")  # iterator--
+            asm.append(f"STORE {reg_address}")  # store iterator--
+            asm.append(f"SWAP {reg_aux}")  # save iterator in REGISTER reg_aux
+
+            asm += gen_lev_add
+            asm.append(f"SWAP {reg_address}")
+            asm.append(f"LOAD {reg_address}")  # load value of end_value to REGISTER a
+
+            asm.append(f"SUB {reg_aux}")  # end_value - iterator
+            asm.append(f"JPOS {len_commands_asm + 2}")  # omit loop, because iterator > end_value
 
             asm += commands_asm
             asm.append(f"JUMP -{9 + len_snippets}")

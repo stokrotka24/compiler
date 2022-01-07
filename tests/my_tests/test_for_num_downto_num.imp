@@ -1,14 +1,14 @@
 VAR
     n, i, a[1:5]
 BEGIN
-    (FOR i FROM 3 TO 5 DO
+    FOR i FROM 5 DOWNTO 3 DO
         WRITE 2;
-    ENDFOR)
+    ENDFOR
 
     READ i;
 
-    FOR i FROM 1 TO 3 DO
-        FOR j FROM -1 TO 2 DO
+    FOR i FROM 3 DOWNTO 1 DO
+        FOR j FROM 2 DOWNTO -1 DO
             WRITE i;
             WRITE j;
         ENDFOR
@@ -16,20 +16,20 @@ BEGIN
 
     WRITE 1000000;
 
-    FOR i FROM -10 TO 5 DO
+    FOR i FROM 5 DOWNTO -10 DO
         WRITE i;
     ENDFOR
 
     WRITE i;
 
-    FOR i FROM 1 TO 5 DO
+    FOR i FROM 5 DOWNTO 1 DO
         a[i] ASSIGN i;
     ENDFOR
-    FOR i FROM 1 TO 5 DO
+    FOR i FROM 5 DOWNTO 1 DO
         WRITE a[i];
     ENDFOR
 
-    FOR i FROM 1 TO 1 DO
+    FOR i FROM 1 DOWNTO 1 DO
         WRITE 3;
     ENDFOR
 END

@@ -63,8 +63,9 @@ class CompilerParser(Parser):
     def command(self, p):
         return self.code_generator.repeat_until(p.condition, p.commands)
 
-    @_('FOR PIDENTIFIER FROM value TO value')
-    def for_to(self, p):
+    @_('FOR PIDENTIFIER FROM value TO value',
+       'FOR PIDENTIFIER FROM value DOWNTO value')
+    def for_init(self, p):
         iterator_name = p.PIDENTIFIER
 
         try:
@@ -73,17 +74,24 @@ class CompilerParser(Parser):
             raise CompilerException(e, p.lineno)
 
         self.symbol_table[iterator_name].initialized = True
-        return ForAttr(iterator_name, p.value0, p.value1, global_var)
+        return ForAttr(iterator_name, p.value0, p.value1, global_var, p[4])
 
-    @_('for_to DO commands ENDFOR')
+    @_('for_init DO commands ENDFOR')
     def command(self, p):
-        return self.code_generator.for_to(p.for_to.pidentifier,
-                                          p.for_to.start_value_attr, p.for_to.end_value_attr,
-                                          p.for_to.global_var, p.commands)
-
-    # @_('FOR PIDENTIFIER FROM value DOWNTO value DO commands ENDFOR')
-    # def command(self, p):
-    #     pass
+        for_type = p.for_init.for_type
+        try:
+            if for_type == "TO":
+                return self.code_generator.for_to(p.for_init.pidentifier,
+                                                  p.for_init.start_value_attr, p.for_init.end_value_attr,
+                                                  p.for_init.global_var, p.commands)
+            elif for_type == "DOWNTO":
+                return self.code_generator.for_downto(p.for_init.pidentifier,
+                                                      p.for_init.start_value_attr, p.for_init.end_value_attr,
+                                                      p.for_init.global_var, p.commands)
+            else:
+                raise Exception("Not allowed for_type")
+        except Exception as e:
+            raise CompilerException(e, p.lineno)
 
     @_('READ identifier ";"')
     def command(self, p):
