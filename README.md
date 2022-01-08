@@ -1,7 +1,7 @@
-###Autor: 
+### Autor: 
 Hanna Stempniewicz
 
-###Zawartość plików:
+### Zawartość plików:
 
 **kompilator.py** - główny plik projektu, parsuje dostarczone tokeny i kompiluje kod wejściowy na kod asemblerowy <br /> 
 **CompilerLexer.py** - lekser <br /> 
@@ -10,11 +10,11 @@ Hanna Stempniewicz
 **ParserAttrs.py** - zawiera klasy pomocnicze do przechowywania atrybutów dla symboli <br /> 
 **SymbolTable.py** - tablica symboli, przechowująca informacje o zmiennych, tablicach, iteratorach pętli dla danego programu <br /> 
 
-###Wymagania do uruchomienia programu (dla systemu Ubuntu):
+### Wymagania do uruchomienia programu (dla systemu Ubuntu):
 - python3.8.10
 - SLY 0.4
 
-###Uruchomienie programu:
+### Uruchomienie programu:
 ```
 python3.8 kompilator.py <nazwa pliku wejściowego> <nazwa pliku wyjściowego>
 ```
