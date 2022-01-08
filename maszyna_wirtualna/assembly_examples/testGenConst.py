@@ -40,6 +40,6 @@ def generateConstant(number=0):
 # Zastanowić, się czy wybór rejestru b jako rejestru pomocniczego jest dobrym wyborem
 
 if __name__ == '__main__':
-    asm_code = generateConstant(-8000000)
+    asm_code = generateConstant(-9223372036854775808)
     asm_code += "HALT \n"
     print(asm_code)

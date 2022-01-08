@@ -6,7 +6,7 @@
 
 import testGenConst
 
-const = 100000000
+const = 30
 asm = ""
 if const == 0:
     asm += "RESET a\n"
