@@ -177,7 +177,7 @@ class CompilerParser(Parser):
             try:
                 asm += self.code_generator.load_var_value(var_name)
             except Exception as e:
-                raise CompilerException(e)
+                raise CompilerException(e, p.identifier.lineno)
             return ValueAttr(asm, "var", var_name)
 
         elif identifier_type == "arr":
@@ -185,14 +185,14 @@ class CompilerParser(Parser):
             asm += self.code_generator.load_arr_elem_value()
             return ValueAttr(asm, "arr", arr_name)
 
-        raise CompilerException("Unexpected type of identifier")
+        raise CompilerException("Unexpected type of identifier", p.identifier.lineno)
 
     @_('PIDENTIFIER')
     def identifier(self, p):
         try:
             var_name = p.PIDENTIFIER
             asm = self.code_generator.get_var_address(var_name)
-            return IdentifierAttr(asm, "var", var_name)
+            return IdentifierAttr(asm, "var", var_name, p.lineno)
         except Exception as e:
             raise CompilerException(e, p.lineno)
 
@@ -203,7 +203,7 @@ class CompilerParser(Parser):
             var_name = p.PIDENTIFIER1
 
             asm = self.code_generator.get_arr_elem_address_with_var_index(arr_name, var_name)
-            return IdentifierAttr(asm, "arr", arr_name)
+            return IdentifierAttr(asm, "arr", arr_name, p.lineno)
         except Exception as e:
             raise CompilerException(e, p.lineno)
 
@@ -213,7 +213,7 @@ class CompilerParser(Parser):
             arr_name = p.PIDENTIFIER
             arr_index = p.NUM
             asm = self.code_generator.get_arr_elem_address(arr_name, arr_index)
-            return IdentifierAttr(asm, "arr", arr_name)
+            return IdentifierAttr(asm, "arr", arr_name, p.lineno)
         except Exception as e:
             raise CompilerException(e, p.lineno)
 

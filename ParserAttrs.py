@@ -1,8 +1,9 @@
 class IdentifierAttr:
-    def __init__(self, identifier_address_asm, identifier_type, identifier_name):
+    def __init__(self, identifier_address_asm, identifier_type, identifier_name, lineno):
         self.identifier_address_asm = identifier_address_asm
         self.identifier_type = identifier_type
         self.identifier_name = identifier_name
+        self.lineno = lineno
 
 
 class ValueAttr:
