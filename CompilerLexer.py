@@ -70,32 +70,3 @@ class CompilerLexer(Lexer):
 
     def error(self, t):
         raise CompilerException(f"Illegal character {t.value[0]}", self.lineno - 1)
-
-
-# TODO rm for release, to test lexer
-if __name__ == '__main__':
-    data = '''
-VAR
-    _nwhtile, p
-BEGIN
-    (KOMENTARZ bardzo dłigi
-    ale bardzo lasny!!
-    aa)
-    READ n;
-    IF n GEQ 0 THEN
-	REPEAT
-	    p ASSIGN n DIV 2;
-	    p ASSIGN -2 TIMES p;
-	    IF n NEQ p THEN 
-		WRITE 1;
-	    ELSE 
-		WRITE 0;
-	    ENDIF
-	    n ASSIGN n DIV 2;
-	UNTIL n EQ 0;
-    ENDIF
-END
-'''
-    lexer = CompilerLexer()
-    for tok in lexer.tokenize(data):
-        print(tok)

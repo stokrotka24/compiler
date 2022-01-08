@@ -233,20 +233,12 @@ def main():
     with open(input_file) as f:
         code = f.read()
     lexer_tokenize = lexer.tokenize(code)
-    # print("LEXER RESULT:")
-    # for tok in tokenize_res:
-    #     print(tok)
-    # print("================")
     try:
         result = parser.parse(lexer_tokenize)
     except CompilerException as ex:
         print(ex)
         sys.exit()
-    print(result)
     result = '\n'.join(result)
-    # print(result)
-    print(parser.symbol_table)
-    # print(result)
     with open(output_file, 'w') as f:
         f.write(result)
 
