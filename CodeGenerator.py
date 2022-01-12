@@ -371,88 +371,115 @@ class CodeGenerator:
         return asm
 
     def div_var_by_var(self, get_var_asm1, get_var_asm2):
+        reg_counter = 'c'  # counter in PART_1, PART_2
+        reg_const = 'd'  # 1 in PART_1, -1 in PART_2
+        reg_quotient = 'f'
+        reg_flag = 'g'  # 0, if there is no need change quotient
+        reg_dividend = 'e'  # =/= a, b, h, because they are used to load divisor
+        reg_divisor = 'b'
+
         asm = []
-        asm.append("RESET c")
-        asm.append("DEC c")
+        asm.append(f"RESET {reg_counter}")
+        asm.append(f"DEC {reg_counter}")
 
-        asm.append("RESET d")
-        asm.append("INC d")
+        asm.append(f"RESET {reg_const}")
+        asm.append(f"INC {reg_const}")
 
-        asm.append("RESET f")
-        asm.append("RESET g")
+        asm.append(f"RESET {reg_quotient}")
+        asm.append(f"RESET {reg_flag}")
 
-        asm += get_var_asm2
+        asm += get_var_asm1  # get dividend, REGISTER: a, b, h
 
-        asm.append(f"JZERO {57 + len(get_var_asm1)}")
-        asm.append("JPOS 5")  # jeśli dzielnik jest niedodatni, obl. wart. bez.
-        asm.append("DEC g")
-        asm.append("SWAP e")
+        asm.append(f"JZERO {65 + len(get_var_asm2)}")  # -> END
+        asm.append("JPOS 5")  # no need set flag
+        asm.append(f"DEC {reg_flag}")  # set flag that dividend < 0
+        asm.append(f"SWAP {reg_dividend}")
         asm.append("RESET a")
-        asm.append("SUB e")
+        asm.append(f"SUB {reg_dividend}")
 
-        asm.append("SWAP e")  # w e wart. bez. dzielnika
-        asm += get_var_asm1
+        asm.append(f"SWAP {reg_dividend}")  # save dividend
 
-        asm.append("JZERO 50")
-        asm.append("JPOS 5")  # jeśli dzielna jest niedodatnia, obl. wart. bez.
-        asm.append("INC g")
-        asm.append("SWAP b")
+        asm += get_var_asm2  # get divisor, REGISTER: a, b, h
+
+        asm.append("JZERO 58")  # -> END
+        asm.append("JPOS 5")  # no need set flag
+        asm.append(f"INC {reg_flag}")  # set flag that divisor < 0
+        asm.append(f"SWAP {reg_divisor}")
         asm.append("RESET a")
-        asm.append("SUB b")
+        asm.append(f"SUB {reg_divisor}")
 
-        asm.append("SWAP b")  # w b wart. bez. dzielnej
-
-        asm.append("JUMP 5")
-
-        asm.append("SWAP e")
-        asm.append("SHIFT d")
-        asm.append("INC c")
-        asm.append("SWAP e")
+        asm.append(f"SWAP {reg_divisor}")  # save divisor
 
         asm.append("RESET a")
-        asm.append("ADD e")
-        asm.append("SUB b")
-        asm.append("JNEG -7")
-        asm.append("JZERO -8")
-
-        asm.append("SWAP e")
-        asm.append("DEC d")
-        asm.append("DEC d")
-        asm.append("SHIFT d")  # podziel dzielnik przez 2
-        asm.append("SWAP b")
-        asm.append("SWAP e")  # zamień dzielną i dzielnik na miejsca
-
+        asm.append(f"ADD {reg_divisor}")
+        asm.append(f"SUB {reg_dividend}")
+        asm.append("JPOS 2")  # |dividend| < |divisor|
+        asm.append("JUMP 3")  # |dividend| >= |divisor|
         asm.append("RESET a")
-        asm.append("ADD e")
-        asm.append("SUB b")
-        asm.append("JNEG 9")
+        asm.append("JUMP 33")  # |dividend| < |divisor|, -> CHANGE_QUOTIENT
+
+        # PART_1
+        asm.append(f"ADD {reg_divisor}")
+        asm.append(f"SWAP {reg_divisor}")
+        asm.append(f"SHIFT {reg_const}")
+        asm.append(f"INC {reg_counter}")
+
+        asm.append(f"SWAP {reg_divisor}")
+        asm.append("JPOS 2")
+        asm.append("JUMP -6")  # divisor <= dividend, -> PART_1
+
+        asm.append(f"RESET {reg_const}")
+        asm.append(f"DEC {reg_const}")
+
+        asm.append(f"SWAP {reg_divisor}")
+        asm.append(f"SHIFT {reg_const}")  # divisor // 2
+        asm.append(f"SWAP {reg_divisor}")  # save divisor
+
+        # PART_2
         asm.append("RESET a")
+        asm.append(f"ADD {reg_dividend}")
+        asm.append(f"SUB {reg_divisor}")
+        asm.append("JNEG 7")  # dividend < divisor, -> UPDATE
+        asm.append(f"SWAP {reg_dividend}")  # dividend = dividend - divisor
+        asm.append("RESET a")  # in REGISTER there is an obsolete dividend, we don't need it no more
         asm.append("INC a")
-        asm.append("SHIFT c")
-        asm.append("ADD f")
-        asm.append("SWAP f")
-        asm.append("SWAP e")
-        asm.append("SUB b")
-        asm.append("SWAP e")
+        asm.append(f"SHIFT {reg_counter}")
+        asm.append(f"ADD {reg_quotient}")
+        asm.append(f"SWAP {reg_quotient}")  # quotient = quotient + 2^(counter)
 
-        asm.append("SWAP b")
-        asm.append("SHIFT d")
-        asm.append("SWAP b")
-        asm.append("DEC c")
+        # UPDATE
+        asm.append(f"SWAP {reg_divisor}")
+        asm.append(f"SHIFT {reg_const}")  # divisor // 2
+        asm.append(f"SWAP {reg_divisor}")  # save divisor
+
+        asm.append(f"DEC {reg_counter}")
         asm.append("RESET a")
         asm.append("DEC a")
-        asm.append("SUB c")
-        asm.append("JNEG -19")
+        asm.append(f"SUB {reg_counter}")
+        asm.append("JNEG -17")  # REGISTER c =/= -1, -> PART_2
 
-        asm.append("SWAP g")
+        asm.append(f"SWAP {reg_dividend}")  # rest
+        asm.append("JZERO 7")  # rest = 0, -> EXCEPTION_CHANGE_QUOTIENT
 
-        asm.append("JZERO 5")
-        asm.append("INC f")
+        # CHANGE_QUOTIENT
+        asm.append(f"SWAP {reg_flag}")
+        asm.append("JZERO 10")  # -> NO_CHANGE_QUOTIENT
         asm.append("RESET a")
-        asm.append("SUB f")
-        asm.append("JUMP 2")
+        asm.append(f"SUB {reg_quotient}")
+        asm.append("DEC a")
+        asm.append("JUMP 7")  # -> END
 
-        asm.append("SWAP f")
+        # EXCEPTION_CHANGE_QUOTIENT
+        asm.append(f"SWAP {reg_flag}")
+        asm.append("JZERO 4")  # -> NO_CHANGE_QUOTIENT
+        asm.append("RESET a")
+        asm.append(f"SUB {reg_quotient}")
+        asm.append("JUMP 2")  # -> END
+
+        # NO_CHANGE_QUOTIENT
+        asm.append(f"SWAP {reg_quotient}")
+
+        # END
 
         return asm
 

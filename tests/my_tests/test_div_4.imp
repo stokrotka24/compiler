@@ -1,0 +1,107 @@
+(
+> 3
+> -4
+> -4
+> 3
+> 0
+> -1
+> -1
+> 0
+> 0
+> 0
+> 0
+> 0
+> 0
+> 5
+> -5
+> -5
+> 5
+)
+VAR
+    a, b, c
+BEGIN
+    a ASSIGN 26;
+    b ASSIGN 7;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 26;
+    b ASSIGN -7;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN -26;
+    b ASSIGN 7;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN -26;
+    b ASSIGN -7;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 5;
+    b ASSIGN 7;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 5;
+    b ASSIGN -7;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN -5;
+    b ASSIGN 7;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN -5;
+    b ASSIGN -7;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 44;
+    b ASSIGN 0;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN -44;
+    b ASSIGN 0;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 0;
+    b ASSIGN 0;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 0;
+    b ASSIGN 44;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 0;
+    b ASSIGN -44;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 15;
+    b ASSIGN 3;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN 15;
+    b ASSIGN -3;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN -15;
+    b ASSIGN 3;
+    c ASSIGN a DIV b;
+    WRITE c;
+
+    a ASSIGN -15;
+    b ASSIGN -3;
+    c ASSIGN a DIV b;
+    WRITE c;
+END
