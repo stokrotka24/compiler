@@ -391,24 +391,24 @@ class CodeGenerator:
         asm += get_var_asm1  # get dividend, REGISTER: a, b, h
 
         asm.append(f"JZERO {65 + len(get_var_asm2)}")  # -> END
-        asm.append("JPOS 5")  # no need set flag
+        asm.append("JPOS 5")  # no need set dividend flag
         asm.append(f"DEC {reg_flag}")  # set flag that dividend < 0
         asm.append(f"SWAP {reg_dividend}")
         asm.append("RESET a")
         asm.append(f"SUB {reg_dividend}")
 
-        asm.append(f"SWAP {reg_dividend}")  # save dividend
+        asm.append(f"SWAP {reg_dividend}")  # save |dividend|
 
         asm += get_var_asm2  # get divisor, REGISTER: a, b, h
 
         asm.append("JZERO 58")  # -> END
-        asm.append("JPOS 5")  # no need set flag
+        asm.append("JPOS 5")  # no need set divisor flag
         asm.append(f"INC {reg_flag}")  # set flag that divisor < 0
         asm.append(f"SWAP {reg_divisor}")
         asm.append("RESET a")
         asm.append(f"SUB {reg_divisor}")
 
-        asm.append(f"SWAP {reg_divisor}")  # save divisor
+        asm.append(f"SWAP {reg_divisor}")  # save |divisor|
 
         asm.append("RESET a")
         asm.append(f"ADD {reg_divisor}")
@@ -502,105 +502,127 @@ class CodeGenerator:
         return asm
 
     def mod_var_by_var(self, get_var_asm1, get_var_asm2):
+        reg_counter = 'c'  # counter in PART_1, PART_2
+        reg_const = 'd'  # 1 in PART_1, -1 in PART_2
+        reg_dividend_flag = 'f'  # 1 if dividend < 0, 0 otherwise
+        reg_divisor_flag = 'g'  # 1 if divisor < 0, 0 otherwise
+        reg_dividend = 'e'  # =/= a, b, h, because they are used to load divisor
+        reg_divisor = 'b'
+        reg_divisor_abs = 'h'  # |divisor| needed for changing rest
+
         asm = []
-        asm.append("RESET c")
-        asm.append("DEC c")
+        asm.append(f"RESET {reg_counter}")
+        asm.append(f"DEC {reg_counter}")
 
-        asm.append("RESET d")
-        asm.append("INC d")
+        asm.append(f"RESET {reg_const}")
+        asm.append(f"INC {reg_const}")
 
-        asm.append("RESET f")  # 1 - dzielna ujemna
-        asm.append("RESET g")  # 1 - dzielnik ujemny
+        asm.append(f"RESET {reg_dividend_flag}")
+        asm.append(f"RESET {reg_divisor_flag}")
 
-        asm += get_var_asm2
+        asm += get_var_asm1  # get dividend, REGISTER: a, b, h
 
-        asm.append(f"JZERO {74 + len(get_var_asm1)}")
-        asm.append("JPOS 5")  # jeśli dzielnik jest niedodatni, obl. wart. bez.
-        asm.append("INC g")
-        asm.append("SWAP e")
+        asm.append(f"JZERO {69 + len(get_var_asm2)}")  # -> END
+        asm.append("JPOS 5")  # no need set dividend flag
+        asm.append(f"INC {reg_dividend_flag}")  # set flag that dividend < 0
+        asm.append(f"SWAP {reg_dividend}")
         asm.append("RESET a")
-        asm.append("SUB e")
+        asm.append(f"SUB {reg_dividend}")
 
-        asm.append("SWAP e")  # w e wart. bez. dzielnika
-        asm += get_var_asm1
+        asm.append(f"SWAP {reg_dividend}")  # save |dividend|
 
-        asm.append("JZERO 67")
-        asm.append("JPOS 5")  # jeśli dzielna jest niedodatnia, obl. wart. bez.
-        asm.append("INC f")
-        asm.append("SWAP b")
+        asm += get_var_asm2  # get divisor, REGISTER: a, b, h
+
+        asm.append("JZERO 62")  # -> END
+        asm.append("JPOS 5")  # no need set divisor flag
+        asm.append(f"INC {reg_divisor_flag}")  # set flag that divisor < 0
+        asm.append(f"SWAP {reg_divisor}")
         asm.append("RESET a")
-        asm.append("SUB b")
+        asm.append(f"SUB {reg_divisor}")
 
-        asm.append("SWAP b")  # w b wart. bez. dzielnej
+        asm.append(f"SWAP {reg_divisor}")  # save |divisor|
+        asm.append(f"RESET a")
+        asm.append(f"ADD {reg_divisor}")
+        asm.append(f"SWAP {reg_divisor_abs}")
+
         asm.append("RESET a")
-        asm.append("ADD e")
-        asm.append("SWAP h")  # w h wart. bez. dzielnika
+        asm.append(f"ADD {reg_divisor}")
+        asm.append(f"SUB {reg_dividend}")
+        asm.append("JPOS 2")  # |dividend| < |divisor|
+        asm.append("JUMP 3")  # |dividend| >= |divisor|
+        asm.append("RESET a")
+        asm.append("JUMP 26")  # |dividend| < |divisor|, -> CHANGE_REST
 
-        asm.append("RESET a")  # dzielna mniejsza od dzielnika
-        asm.append("ADD e")
-        asm.append("SUB b")
+        # PART_1
+        asm.append(f"ADD {reg_divisor}")
+        asm.append(f"SWAP {reg_divisor}")
+        asm.append(f"SHIFT {reg_const}")
+        asm.append(f"INC {reg_counter}")
+
+        asm.append(f"SWAP {reg_divisor}")
         asm.append("JPOS 2")
-        asm.append("JUMP 5")
+        asm.append("JUMP -6")  # divisor <= dividend, -> PART_1
+
+        asm.append(f"RESET {reg_const}")
+        asm.append(f"DEC {reg_const}")
+
+        asm.append(f"SWAP {reg_divisor}")
+        asm.append(f"SHIFT {reg_const}")  # divisor // 2
+        asm.append(f"SWAP {reg_divisor}")  # save divisor
+
+        # PART_2
         asm.append("RESET a")
-        asm.append("ADD b")
-        asm.append("SWAP e")
-        asm.append("JUMP 32")
+        asm.append(f"ADD {reg_dividend}")
+        asm.append(f"SUB {reg_divisor}")
+        asm.append("JNEG 2")  # dividend < divisor, -> UPDATE
+        asm.append(f"SWAP {reg_dividend}")  # dividend = dividend - divisor
 
-        asm.append("JUMP 5")
+        # UPDATE
+        asm.append(f"SWAP {reg_divisor}")
+        asm.append(f"SHIFT {reg_const}")  # divisor // 2
+        asm.append(f"SWAP {reg_divisor}")  # save divisor
 
-        asm.append("SWAP e")
-        asm.append("SHIFT d")
-        asm.append("INC c")
-        asm.append("SWAP e")
-
-        asm.append("RESET a")
-        asm.append("ADD e")
-        asm.append("SUB b")
-        asm.append("JNEG -7")
-        asm.append("JZERO -8")
-
-        asm.append("SWAP e")
-        asm.append("DEC d")
-        asm.append("DEC d")
-        asm.append("SHIFT d")  # podziel dzielnik przez 2
-        asm.append("SWAP b")
-        asm.append("SWAP e")  # zamień dzielną i dzielnik na miejsca
-
-        asm.append("RESET a")
-        asm.append("ADD e")
-        asm.append("SUB b")
-        asm.append("JNEG 4")
-        asm.append("SWAP e")
-        asm.append("SUB b")
-        asm.append("SWAP e")
-
-        asm.append("SWAP b")
-        asm.append("SHIFT d")
-        asm.append("SWAP b")
-        asm.append("DEC c")
+        asm.append(f"DEC {reg_counter}")
         asm.append("RESET a")
         asm.append("DEC a")
-        asm.append("SUB c")
-        asm.append("JNEG -14")
+        asm.append(f"SUB {reg_counter}")
+        asm.append("JNEG -12")  # REGISTER c =/= -1, -> PART_2
 
-        asm.append("SWAP f")
+        # CHANGE_REST
+        asm.append(f"SWAP {reg_dividend_flag}")
+        asm.append("JZERO 12")  # -> DIVIDEND_NONNEG
 
-        asm.append("JZERO 9")
-        asm.append("SWAP g")
-        asm.append("JZERO 4")
-        asm.append("RESET a")  # CASE: dzielna ujemna, dzielnik ujemny
-        asm.append("SUB e")
-        asm.append("JUMP 11")
-        asm.append("SUB e")  # CASE: dzielna ujemna, dzielnik nieujemny
-        asm.append("ADD h")
-        asm.append("JUMP 8")
-        asm.append("SWAP g")
-        asm.append("JZERO 5")
-        asm.append("RESET a")  # CASE: dzielna nieujemna, dzielnik ujemny
-        asm.append("ADD e")
-        asm.append("SUB h")
-        asm.append("JUMP 2")
-        asm.append("SWAP e")  # CASE: dzielna nieujemna, dzielnik nieujemny
+        # DIVIDEND_NEG
+        asm.append(f"SWAP {reg_divisor_flag}")
+        asm.append("JZERO 4")  # -> DIVIDEND_NEG, DIVISOR_NONNEG
+
+        # DIVIDEND_NEG, DIVISOR_NEG ( rest = - rest )
+        asm.append("RESET a")
+        asm.append(f"SUB {reg_dividend}")
+        asm.append("JUMP 14")  # -> END
+
+        # DIVIDEND_NEG, DIVISOR_NONNEG ( rest = |divisor| - rest )
+        asm.append(f"SWAP {reg_dividend}")
+        asm.append("JZERO 12")  # rest = 0, no need to change rest, -> END
+        asm.append(f"SWAP {reg_dividend}")
+        asm.append(f"ADD {reg_divisor_abs}")
+        asm.append(f"SUB {reg_dividend}")
+        asm.append("JUMP 8")  # -> END
+
+        # DIVIDEND_NONNEG
+        asm.append(f"SWAP {reg_divisor_flag}")
+        asm.append("JZERO 5")  # -> DIVIDEND_NONNEG, DIVISOR_NONENEG
+
+        # DIVIDEND_NONNEG, DIVISOR_NEG ( rest = rest - |divisor| )
+        asm.append(f"SWAP {reg_dividend}")
+        asm.append("JZERO 4")  # rest = 0, no need to change rest, -> END
+        asm.append(f"SUB {reg_divisor_abs}")
+        asm.append("JUMP 2")  # -> END
+
+        # DIVIDEND_NONNEG, DIVISOR_NONNEG ( rest = rest )
+        asm.append(f"SWAP {reg_dividend}")
+
+        # END
 
         return asm
 
