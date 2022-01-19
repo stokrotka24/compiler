@@ -265,90 +265,87 @@ class CodeGenerator:
     # REGISTER: a, b, c, d, e, f, g
     def mul_var_by_var(self, get_var_asm1, get_var_asm2):
         asm = []
-        reg_aux1 = 'c'  # najpierw przechowuje 1 zmienną, potem przechowuje -1 do zamiany na system binarny
-        reg_aux2 = 'b'  # najpierw przechowuje 2 zmienną, potem przechowuje wyniki związane z zamianą na system binarny
-        reg_smaller = 'd'
-        reg_expo = 'e'
-        reg_rec_res = 'f'
+        reg_factor_1 = 'c'
+        reg_factor_2 = 'b'
+        reg_minus_one = 'd'
+        reg_one = 'e'
+        reg_result = 'f'
         reg_sign = 'g'
 
-        asm += get_var_asm1  # wczytanie 1. zmiennej
-        asm.append(f"RESET {reg_sign}")  # jeżeli jest równy 0, to nie bedziemy zmieniac znaku mnozenia
+        asm.append(f"RESET {reg_minus_one}")
+        asm.append(f"DEC {reg_minus_one}")  # -1 to divide by 2
+        asm.append(f"RESET {reg_one}")
+        asm.append(f"INC {reg_one}")  # 1 to multiply by 2
+        asm.append(f"RESET {reg_result}")
+        asm.append(f"RESET {reg_sign}")
 
+        asm += get_var_asm1  # get factor1, REGISTER: a, b, h
+
+        asm.append("JZERO 44")  # factor1 = 0, -> END
         asm.append("JPOS 5")
 
-        # wartość bezwzględna 1.zmiennej, jeśli jest niedodatnia
         asm.append(f"DEC {reg_sign}")
-        asm.append(f"SWAP {reg_aux1}")
+        asm.append(f"SWAP {reg_factor_1}")
         asm.append("RESET a")
-        asm.append(f"SUB {reg_aux1}")
+        asm.append(f"SUB {reg_factor_1}")
 
-        asm.append(f"SWAP {reg_aux1}")  # zapisanie 1. zmiennej w rejestrze reg_aux1
+        asm.append(f"SWAP {reg_factor_1}")
 
-        asm += get_var_asm2  # wczytanie 2. zmiennej
-
+        asm += get_var_asm2  # get factor2, REGISTER: a, b, h
+        asm.append("JZERO 36")  # factor2 = 0, -> END
         asm.append("JPOS 5")
 
-        # wartość bezwzględna 2.zmiennej, jeśli jest ujemna
         asm.append(f"INC {reg_sign}")
-        asm.append(f"SWAP {reg_aux2}")
+        asm.append(f"SWAP {reg_factor_2}")
         asm.append("RESET a")
-        asm.append(f"SUB {reg_aux2}")
+        asm.append(f"SUB {reg_factor_2}")
 
-        asm.append(f"SWAP {reg_aux2}")  # zapisanie 2. zmiennej w rejestrze reg_aux2
-
-        # sprawdzenie, która liczba ma mniejszą wartość bezwzględną
-        asm.append("RESET a")
-        asm.append(f"ADD {reg_aux1}")
-        asm.append(f"SUB {reg_aux2}")
-        asm.append("JNEG 6")
-        asm.append(f"SWAP {reg_aux1}")
-        asm.append(f"SWAP {reg_smaller}")
-        asm.append("RESET a")
-        asm.append(f"ADD {reg_aux2}")
-        asm.append("JUMP 5")
-        asm.append(f"SWAP {reg_aux2}")
-        asm.append(f"SWAP {reg_smaller}")
-        asm.append("RESET a")
-        asm.append(f"ADD {reg_aux1}")
-        # teraz w rejestrze a mamy większą liczbę z 2 wczytanych
-        asm.append(f"RESET {reg_aux1}")
-        asm.append(f"DEC {reg_aux1}")  # -1 do dzielenia przez 2
-        asm.append(f"RESET {reg_expo}")  # wykladnik potęgi
-        asm.append(f"RESET {reg_rec_res}")  # aktualny wynik mnożenia
-
-        asm.append(f"SWAP {reg_aux2}")
-        asm.append("RESET a")
-        asm.append(f"ADD {reg_aux2}")
-        asm.append(f"SHIFT {reg_aux1}")
-        asm.append(f"SWAP {reg_aux2}")
-        asm.append(f"SUB {reg_aux2}")
-        asm.append(f"SUB {reg_aux2}")
-
-        asm.append("JZERO 8")
+        asm.append(f"SWAP {reg_factor_2}")
 
         asm.append("RESET a")
-        asm.append(f"ADD {reg_smaller}")
-        asm.append(f"SHIFT {reg_expo}")  # mnożymy przez odpowiednią potęgę dwójki
-        asm.append(f"ADD {reg_rec_res}")  # dodajemy poprzedni wynik
-        asm.append(f"SWAP {reg_rec_res}")
-        asm.append("RESET a")
-        asm.append("INC a")
+        asm.append(f"ADD {reg_factor_1}")
+        asm.append(f"SUB {reg_factor_2}")  # REGISTER a: factor1 - factor2
+        asm.append("JPOS 4 ")  # factor1 > factor2, no need to swap factor1 and factor2
 
-        asm.append(f"INC {reg_expo}")
-        asm.append(f"SWAP {reg_aux2}")
-        asm.append("JPOS -17")
+        # SWAP (factor1 <=> factor2)
+        asm.append(f"SWAP {reg_factor_1}")
+        asm.append(f"SWAP {reg_factor_2}")
+        asm.append(f"SWAP {reg_factor_1}")
+
+        asm.append("RESET a")
+        asm.append(f"ADD {reg_factor_2}")
+
+        # LAST_BIT_FACTOR_2
+        asm.append(f"SHIFT {reg_minus_one}")  # factor2 // 2
+        asm.append(f"SWAP {reg_factor_2}")
+        asm.append(f"SUB {reg_factor_2}")
+        asm.append(f"SUB {reg_factor_2}")
+
+        asm.append("JZERO 5")  # -> SHIFT_LEFT_FACTOR_1
+
+        # RESULT_UPDATE
+        asm.append("RESET a")
+        asm.append(f"SWAP {reg_result}")
+        asm.append(f"ADD {reg_factor_1}")
+        asm.append(f"SWAP {reg_result}")
+
+        # SHIFT_LEFT_FACTOR_1
+        asm.append(f"SWAP {reg_factor_1}")
+        asm.append(f"SHIFT {reg_one}")
+        asm.append(f"SWAP {reg_factor_1}")
+        asm.append(f"ADD {reg_factor_2}")
+        asm.append("JPOS -13")  # -> LAST_BIT_FACTOR_2
 
         asm.append(f"SWAP {reg_sign}")
+        asm.append("JZERO 4")  # -> END
 
-        asm.append("JZERO 4")
-
-        # zmienianie znaku wyniku na ujemny, jeśli potrzeba
         asm.append("RESET a")
-        asm.append(f"SUB {reg_rec_res}")
+        asm.append(f"SUB {reg_result}")
         asm.append("JUMP 2")
 
-        asm.append(f"SWAP {reg_rec_res}")
+        asm.append(f"SWAP {reg_result}")
+
+        # END
 
         return asm
 
@@ -809,7 +806,6 @@ class CodeGenerator:
                     asm += commands_asm
 
         else:
-            pass
             if type1 == "var" and start_value_attr.value_content == iterator_name:
                 raise Exception(f"Iterator {iterator_name} can't be as one of range of loop")
             if type2 == "var" and end_value_attr.value_content == iterator_name:

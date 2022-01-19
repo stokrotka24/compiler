@@ -1,0 +1,60 @@
+(
+120
+120
+-120
+-120
+-120
+-120
+120
+120
+0
+0
+0
+0
+)
+VAR
+    a, b, c
+BEGIN
+    a ASSIGN 30;
+    b ASSIGN 4;
+    c ASSIGN a TIMES b;
+    WRITE c;
+    c ASSIGN b TIMES a;
+    WRITE c;
+
+
+    a ASSIGN -30;
+    b ASSIGN 4;
+    c ASSIGN a TIMES b;
+    WRITE c;
+    c ASSIGN b TIMES a;
+    WRITE c;
+
+    a ASSIGN 30;
+    b ASSIGN -4;
+    c ASSIGN a TIMES b;
+    WRITE c;
+    c ASSIGN b TIMES a;
+    WRITE c;
+
+    a ASSIGN -30;
+    b ASSIGN -4;
+    c ASSIGN a TIMES b;
+    WRITE c;
+    c ASSIGN b TIMES a;
+    WRITE c;
+
+    a ASSIGN -30;
+    b ASSIGN 0;
+    c ASSIGN a TIMES b;
+    WRITE c;
+    c ASSIGN b TIMES a;
+    WRITE c;
+
+    a ASSIGN 0;
+    b ASSIGN 0;
+    c ASSIGN a TIMES b;
+    WRITE c;
+    c ASSIGN b TIMES a;
+    WRITE c;
+END
