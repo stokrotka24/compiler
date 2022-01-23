@@ -8,17 +8,17 @@ class CodeGenerator:
     # REGISTER: a, b
     def generate_const(self, number):
         asm = []
-        reg_1 = 'b'
+        reg_one = 'b'
         instr = "INC" if number >= 0 else "DEC"
 
         binary = f'{abs(number):b}'
         asm.append("RESET a")
-        asm.append(f"RESET {reg_1}")
-        asm.append(f"INC {reg_1}")
-        for bit in binary[:-1]:
-            if bit == '1':
+        asm.append(f"RESET {reg_one}")
+        asm.append(f"INC {reg_one}")
+        for b in binary[:-1]:
+            if b == '1':
                 asm.append(f"{instr} a")
-            asm.append(f"SHIFT {reg_1}")
+            asm.append(f"SHIFT {reg_one}")
         if binary[-1] == '1':
             asm.append(f"{instr} a")
         return asm
@@ -58,23 +58,21 @@ class CodeGenerator:
             raise Exception(f"{arr_name} is a variable, not an array")
 
         asm = []
+        reg_aux = 'h'
 
         asm += self.get_var_address(var_name)  # REGISTER a, b
         asm += self.load_var_value(var_name)  # REGISTER a, h
-        asm.append("SWAP h")  # save value of var in register h
+        asm.append(f"SWAP {reg_aux}")  # save value of var in register reg_aux
 
         asm += self.generate_const(arr.first_index)  # REGISTER a, b
 
-        # calculate order of elem array[var's value] in array
-        asm.append("SUB h")
-        asm.append("SWAP h")
-        asm.append("RESET a")
-        asm.append("SUB h")
-
-        asm.append("SWAP h")  # save order of elem array[var's value] in array in register h
+        # calculate order of elem array[var's value] in array and save in reg_aux
+        asm.append(f"SWAP {reg_aux}")
+        asm.append(f"SUB {reg_aux}")
+        asm.append(f"SWAP {reg_aux}")
 
         asm += self.generate_const(arr.address)  # REGISTER a, b
-        asm.append("ADD h")
+        asm.append(f"ADD {reg_aux}")
         return asm
 
     # REGISTER: a, h
