@@ -226,7 +226,7 @@ def main():
     parser = CompilerParser()
 
     if len(sys.argv) != 3:
-        raise Exception("usage: python3.8 CompilerParser.py <input_file> <output_file>")
+        raise Exception("usage: python3.8 kompilator.py <input_file> <output_file>")
 
     input_file = sys.argv[1]
     output_file = sys.argv[2]
