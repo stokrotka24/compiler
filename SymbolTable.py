@@ -53,6 +53,6 @@ class SymbolTable(dict):
         if name in self:
             return f"Array {name} already declared"
         if first_index > last_index:
-            return f"First index of array can't be greater then last index of array"
+            return f"First index of array {name} can't be greater then last index of array"
         self[name] = Array(self.data_offset, first_index, last_index)
         self.data_offset += last_index - first_index + 1

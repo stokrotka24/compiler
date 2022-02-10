@@ -1,8 +1,0 @@
-VAR
-    a, b, c
-BEGIN
-    a ASSIGN 3;
-    b ASSIGN 5;
-    c ASSIGN 3 PLUS 5;
-    WRITE c;
-END
